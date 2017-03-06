@@ -3,7 +3,7 @@
 Implementation of interpolated multiline strings that ignores indentation
 and trailing whitespaces.
 
-It's `QuasiQuoter`.
+It's [QuasiQuoter](https://wiki.haskell.org/Quasiquotation).
 
 Actually it's modification of
 [interpolatedstring-perl6](https://github.com/audreyt/interpolatedstring-perl6)
@@ -19,6 +19,18 @@ and trailing whitespaces.
 You could write a decoratively formatted string and your
 decorative indentation and line-breaks wont go to the string,
 but when you really need it, you could just escape it using backslash.
+
+## Simple usage example
+
+```haskell
+{-# LANGUAGE QuasiQuotes #-}
+
+import Text.InterpolatedString.QM (qm)
+
+main :: IO ()
+main = putStrLn [qm| hello
+                   \ world |]
+```
 
 ## Examples
 
