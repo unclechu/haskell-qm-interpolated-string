@@ -32,11 +32,11 @@ main = putStrLn [qm| hello
                    \ world |]
 ```
 
-## Examples
+## More examples
 
 ```haskell
 [qm|   hello world,
-     \ what's going on?  |]
+     \ what's going on here?  |]
 -- Result: "hello world, what's going on here?"
 ```
 
