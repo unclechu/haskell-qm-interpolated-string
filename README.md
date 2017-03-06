@@ -20,7 +20,7 @@ You could write a decoratively formatted string and your
 decorative indentation and line-breaks wont go to the string,
 but when you really need it, you could just escape it using backslash.
 
-# Examples
+## Examples
 
 ```haskell
 [qm|   hello world,
@@ -48,10 +48,10 @@ but when you really need it, you could just escape it using backslash.
 -- Result: "3 {3+4}"
 ```
 
-# Author
+## Author
 
 [Viacheslav Lotsmanov](https://github.com/unclechu)
 
-# License
+## License
 
 [The Unlicense](./LICENSE)
