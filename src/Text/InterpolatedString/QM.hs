@@ -11,6 +11,8 @@
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
 
+{-# LANGUAGE CPP #-}
+
 module Text.InterpolatedString.QM (qm, ShowQ(..)) where
 
 import "base" GHC.Exts (IsString(..))
@@ -21,6 +23,11 @@ import "bytestring" Data.ByteString.Char8 as Strict (ByteString, unpack)
 import "bytestring" Data.ByteString.Lazy.Char8 as Lazy (ByteString, unpack)
 import "text" Data.Text as T (Text, unpack)
 import "text" Data.Text.Lazy as LazyT (Text, unpack)
+
+#if MIN_VERSION_base(4,8,0)
+#else
+import "base" Data.Monoid (mempty, mappend)
+#endif
 
 
 class ShowQ a where
