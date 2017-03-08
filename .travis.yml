@@ -44,6 +44,7 @@ before_install:
  - export HAPPYVER=1.19.5
  - export ALEXVER=3.1.7
  - export PATH=/opt/ghc/$GHCVER/bin:/opt/cabal/$CABALVER/bin:$PATH
+ - export PATH=/opt/happy/$HAPPYVER/bin:$PATH
 
 install:
  - cabal --version
