@@ -36,6 +36,7 @@ library
 
                   -- for travis-ci testing
                   , safe ==0.3.*
+                  , haskell-src-exts ==1.*
 
 test-suite tests
   type:            exitcode-stdio-1.0
