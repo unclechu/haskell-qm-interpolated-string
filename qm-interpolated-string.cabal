@@ -28,6 +28,7 @@ library
   ghc-options:      -Wall
   hs-source-dirs:   src
   exposed-modules:  Text.InterpolatedString.QM
+  build-tools:      happy
   build-depends:    base ==4.*
                   , template-haskell >=2.5 && <3
                   , haskell-src-meta >=0.3 && <0.8
