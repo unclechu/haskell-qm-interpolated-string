@@ -1,5 +1,7 @@
 # [qm|interpolated-string|]
 
+[![Build Status](https://secure.travis-ci.org/unclechu/haskell-qm-interpolated-string.svg)](http://travis-ci.org/unclechu/haskell-qm-interpolated-string)
+
 Implementation of interpolated multiline strings that ignores indentation
 and trailing whitespaces.
 
