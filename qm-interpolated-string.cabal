@@ -34,6 +34,9 @@ library
                   , bytestring ==0.10.*
                   , text ==1.*
 
+                  -- for travis-ci testing
+                  , safe ==0.3.*
+
 test-suite tests
   type:            exitcode-stdio-1.0
   ghc-options:     -Wall -fno-warn-type-defaults
