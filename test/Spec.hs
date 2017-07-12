@@ -50,6 +50,15 @@ main = hspec $ do
                                    [qm| foo\\\bar |]  `shouldBe` "foo\\\\bar"
                                    [qm| foo\\\\bar |] `shouldBe` "foo\\\\bar"
 
+    it "Empty string" $ [qm|  |] `shouldBe` ""
+
+    it "Escaping space by slash at EOL after space" $
+      [qm| foo \
+           bar |] `shouldBe` "foo bar"
+
+    it "Escaped spaces at the edges" $ do [qm| foo\ |] `shouldBe` "foo "
+                                          [qm|\ foo |] `shouldBe` " foo"
+
   describe "QN (QM but without interpolation)" $ do
 
     describe "Examples from README" $ do
@@ -90,3 +99,12 @@ main = hspec $ do
                                    [qn| foo\\bar |]   `shouldBe` "foo\\bar"
                                    [qn| foo\\\bar |]  `shouldBe` "foo\\\\bar"
                                    [qn| foo\\\\bar |] `shouldBe` "foo\\\\bar"
+
+    it "Empty string" $ [qn|  |] `shouldBe` ""
+
+    it "Escaping space by slash at EOL after space" $
+      [qn| foo \
+           bar |] `shouldBe` "foo bar"
+
+    it "Escaped spaces at the edges" $ do [qn| foo\ |] `shouldBe` "foo "
+                                          [qn|\ foo |] `shouldBe` " foo"

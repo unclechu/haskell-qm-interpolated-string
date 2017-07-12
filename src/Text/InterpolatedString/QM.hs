@@ -152,6 +152,22 @@ reify s = case parseExp s of
 -- [qm| foo {'b':'a':'r':""}
 --    \\ baz |] -- "foo bar baz"
 -- @
+--
+-- Symbols that could be escaped:
+--
+--   * @\\@ - backslash itself (two backslashes one by one: @\\\\@)
+--     @[qm| foo\\\\bar |] -- "foo\\\\bar"@
+--
+--   * Space symbol at the edge
+--     (to put it to the output instead of just ignoring it)
+--     @[qm| foo\\ |] -- "foo "@ or @[qm|\\ foo |] -- " foo"@
+--
+--   * Line break @\\n@ (actual line breaks are ignored)
+--
+--   * Opening bracket of interpolation block @\\{@
+--     to prevent interpolatin and put it as it is
+--     @[qm| {1+2} \\{3+4} |] -- "3 {3+4}"@
+--
 qm :: QuasiQuoter
 qm = QuasiQuoter f
   (error "Cannot use qm as a pattern")
@@ -167,6 +183,11 @@ qm = QuasiQuoter f
 -- [qn| foo {'b':'a':'r':""}
 --    \\ baz |] -- "foo {'b':'a':'r':\\"\\"} baz"
 -- @
+--
+-- Interpolation blocks goes just as text:
+--
+-- @[qn| {1+2} \\{3+4} |] -- "{1+2} \\\\{3+4}"@
+--
 qn :: QuasiQuoter
 qn = QuasiQuoter f
   (error "Cannot use qn as a pattern")
