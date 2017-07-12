@@ -1,5 +1,5 @@
 name:               qm-interpolated-string
-version:            0.1.0.0
+version:            0.1.1.0
 synopsis:           Implementation of interpolated multiline strings
 description:        Implementation of interpolated multiline strings
                     that ignores indentation and trailing whitespaces
