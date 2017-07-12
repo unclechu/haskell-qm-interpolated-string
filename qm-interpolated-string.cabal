@@ -11,7 +11,7 @@ copyright:          Viacheslav Lotsmanov
 maintainer:         Viacheslav Lotsmanov <lotsmanov89@gmail.com>
 category:           Data
 build-type:         Simple
-extra-source-files: README.md
+extra-source-files: README.md CHANGELOG.md
 cabal-version:      >=1.8
 tested-with:        GHC == 7.6.3
                   , GHC == 7.8.4
