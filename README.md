@@ -3,10 +3,9 @@
 [![Hackage](https://img.shields.io/hackage/v/qm-interpolated-string.svg)](https://hackage.haskell.org/package/qm-interpolated-string)
 [![Build Status](https://travis-ci.org/unclechu/haskell-qm-interpolated-string.svg?branch=master)](https://travis-ci.org/unclechu/haskell-qm-interpolated-string)
 
-Implementation of interpolated multiline string QuasiQuoter
+Implementation of interpolated multiline string
+[QuasiQuoter](https://wiki.haskell.org/Quasiquotation)
 that ignores indentation and trailing whitespaces.
-
-It's [QuasiQuoter](https://wiki.haskell.org/Quasiquotation).
 
 Actually it's modification of
 [interpolatedstring-perl6](https://github.com/audreyt/interpolatedstring-perl6)
