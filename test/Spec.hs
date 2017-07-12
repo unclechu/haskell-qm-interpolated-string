@@ -84,6 +84,9 @@ main = hspec $ do
       it "Fourth (escaping interpolation blocks to show them as text)" $
         [qn| {1+2} \{3+4} |] `shouldBe` "{1+2} \\{3+4}"
 
+      it "Example of `qn` QuasiQuoter" $
+        [qn| foo {1+2} |] `shouldBe` "foo {1+2}"
+
     it "Type annotation in interpolation block" $
       [qn|{10 :: Float}|] `shouldBe` "{10 :: Float}"
 

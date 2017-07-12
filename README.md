@@ -63,6 +63,14 @@ main = putStrLn [qm| hello
 -- Result: "3 {3+4}"
 ```
 
+There is also very similar to `qm` QuasiQuoter
+named as `qn` that do the same except interpolation:
+
+```haskell
+[qn| foo {1+2} |]
+-- Result: "foo {1+2}"
+```
+
 ## Author
 
 [Viacheslav Lotsmanov](https://github.com/unclechu)
