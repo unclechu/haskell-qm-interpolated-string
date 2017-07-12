@@ -13,7 +13,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module Text.InterpolatedString.QM (qm, ShowQ(..)) where
+module Text.InterpolatedString.QM (qm, qn, ShowQ(..)) where
 
 import "base" GHC.Exts (IsString (fromString))
 import qualified "template-haskell" Language.Haskell.TH as TH
@@ -67,26 +67,39 @@ data StringPart = Literal String | AntiQuote String deriving Show
 
 
 unQM :: String -> String -> [StringPart]
-unQM a []          = [Literal (reverse a)]
+unQM a ""          = [Literal (reverse a)]
 unQM a ('\\':x:xs) = unQM (x:a) xs
-unQM a ("\\")      = unQM ('\\':a) []
-unQM a ('}':xs)    = AntiQuote (reverse a) : parseQM [] xs
+unQM a ("\\")      = unQM ('\\':a) ""
+unQM a ('}':xs)    = AntiQuote (reverse a) : parseQM "" xs
 unQM a (x:xs)      = unQM (x:a) xs
 
 
 parseQM :: String -> String -> [StringPart]
-parseQM a []             = [Literal (reverse a)]
+parseQM a ""             = [Literal (reverse a)]
 parseQM a ('\\':'\\':xs) = parseQM ('\\':a) xs
 parseQM a ('\\':'{':xs)  = parseQM ('{':a) xs
 parseQM a ('\\':' ':xs)  = parseQM (' ':a) xs
 parseQM a ('\\':'\n':xs) = parseQM a ('\n':xs)
 parseQM a ('\\':'n':xs)  = parseQM ('\n':a) xs
-parseQM a ("\\")         = parseQM ('\\':a) []
-parseQM a ('{':xs)       = Literal (reverse a) : unQM [] xs
+parseQM a ("\\")         = parseQM ('\\':a) ""
+parseQM a ('{':xs)       = Literal (reverse a) : unQM "" xs
 parseQM a (clearIndentAtSOF   -> Just clean) = parseQM a clean
 parseQM a (clearIndentTillEOF -> Just clean) = parseQM a clean
 parseQM a ('\n':xs)      = parseQM a xs -- cut off line breaks
 parseQM a (x:xs)         = parseQM (x:a) xs
+
+
+parseQN :: String -> String -> [StringPart]
+parseQN a ""             = [Literal (reverse a)]
+parseQN a ('\\':'\\':xs) = parseQN ('\\':a) xs
+parseQN a ('\\':' ':xs)  = parseQN (' ':a) xs
+parseQN a ('\\':'\n':xs) = parseQN a ('\n':xs)
+parseQN a ('\\':'n':xs)  = parseQN ('\n':a) xs
+parseQN a ("\\")         = parseQN ('\\':a) ""
+parseQN a (clearIndentAtSOF   -> Just clean) = parseQN a clean
+parseQN a (clearIndentTillEOF -> Just clean) = parseQN a clean
+parseQN a ('\n':xs)      = parseQN a xs -- cut off line breaks
+parseQN a (x:xs)         = parseQN (x:a) xs
 
 
 clearIndentTillEOF :: String -> Maybe String
@@ -133,9 +146,30 @@ reify s = case parseExp s of
                Right e -> return e
 
 
+-- | QuasiQuoter for multiline interpolated string.
+--
+-- @
+-- [qm| foo {'b':'a':'r':""}
+--    \\ baz |] -- "foo bar baz"
+-- @
 qm :: QuasiQuoter
 qm = QuasiQuoter f
   (error "Cannot use qm as a pattern")
   (error "Cannot use qm as a type")
   (error "Cannot use qm as a dec")
-  where f = makeExpr . parseQM [] . clearIndentAtStart . filter (/= '\r')
+  where f = makeExpr . parseQM "" . clearIndentAtStart . filter (/= '\r')
+
+
+-- | Works just like `qm` but without interpolation
+--   (just multiline string with decorative indentation).
+--
+-- @
+-- [qn| foo {'b':'a':'r':""}
+--    \\ baz |] -- "foo {'b':'a':'r':\\"\\"} baz"
+-- @
+qn :: QuasiQuoter
+qn = QuasiQuoter f
+  (error "Cannot use qn as a pattern")
+  (error "Cannot use qn as a type")
+  (error "Cannot use qn as a dec")
+  where f = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
