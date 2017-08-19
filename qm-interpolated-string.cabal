@@ -29,7 +29,7 @@ library
   exposed-modules:  Text.InterpolatedString.QM
   build-depends:    base ==4.*
                   , template-haskell >=2.5 && <3
-                  , haskell-src-meta >=0.3 && <0.8
+                  , haskell-src-meta >=0.3 && <0.9
                   , bytestring ==0.10.*
                   , text ==1.*
 

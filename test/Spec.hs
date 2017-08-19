@@ -1,5 +1,6 @@
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE QuasiQuotes #-}
+{-# OPTIONS_GHC -Wno-tabs #-}
 
 module Main (main) where
 
@@ -59,6 +60,29 @@ main = hspec $ do
     it "Escaped spaces at the edges" $ do [qm| foo\ |] `shouldBe` "foo "
                                           [qm|\ foo |] `shouldBe` " foo"
 
+    describe "Tabs as indentation" $ do
+
+      it "Tabs is only indentation at left side" $ do
+				[qm|
+					foo  bar  baz
+				|] `shouldBe` "foo  bar  baz"
+
+				[qm|			foo bar baz|] `shouldBe` "foo bar baz"
+
+      it "Tabs also at EOL" $ do
+				[qm|
+					foo  bar  baz				
+				|] `shouldBe` "foo  bar  baz"
+
+				[qm|			foo bar baz				|] `shouldBe` "foo bar baz"
+
+      it "Escaped tabs" $ do
+        [qm|		\tfoo|]    `shouldBe` "\tfoo"
+        [qm|		\	foo	|]   `shouldBe` "\tfoo"
+        [qm|	foo		\	|]   `shouldBe` "foo\t\t\t"
+        [qm|	foo	\		|]   `shouldBe` "foo\t\t"
+        [qm|	foo\			|] `shouldBe` "foo\t"
+
   describe "QN (QM but without interpolation)" $ do
 
     describe "Examples from README" $ do
@@ -111,3 +135,26 @@ main = hspec $ do
 
     it "Escaped spaces at the edges" $ do [qn| foo\ |] `shouldBe` "foo "
                                           [qn|\ foo |] `shouldBe` " foo"
+
+    describe "Tabs as indentation" $ do
+
+      it "Tabs is only indentation at left side" $ do
+				[qn|
+					foo  bar  baz
+				|] `shouldBe` "foo  bar  baz"
+
+				[qn|			foo bar baz|] `shouldBe` "foo bar baz"
+
+      it "Tabs also at EOL" $ do
+				[qn|
+					foo  bar  baz				
+				|] `shouldBe` "foo  bar  baz"
+
+				[qn|			foo bar baz				|] `shouldBe` "foo bar baz"
+
+      it "Escaped tabs" $ do
+        [qn|		\tfoo|]    `shouldBe` "\tfoo"
+        [qn|		\	foo	|]   `shouldBe` "\tfoo"
+        [qn|	foo		\	|]   `shouldBe` "foo\t\t\t"
+        [qn|	foo	\		|]   `shouldBe` "foo\t\t"
+        [qn|	foo\			|] `shouldBe` "foo\t"

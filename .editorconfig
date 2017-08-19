@@ -8,3 +8,6 @@ end_of_line = lf
 [*.{hs,md,cabal,yml}]
 indent_style = space
 indent_size = 2
+
+[test/*.hs]
+trim_trailing_whitespace = false
