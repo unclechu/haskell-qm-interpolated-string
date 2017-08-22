@@ -1,6 +1,5 @@
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE QuasiQuotes #-}
-{-# OPTIONS_GHC -Wno-tabs #-}
 
 module Main (main) where
 
