@@ -157,3 +157,41 @@ main = hspec $ do
         [qn|	foo		\	|]   `shouldBe` "foo\t\t\t"
         [qn|	foo	\		|]   `shouldBe` "foo\t\t"
         [qn|	foo\			|] `shouldBe` "foo\t"
+
+  {-
+  describe "QY (interpolated string with line-breaks)" $ do
+
+    it "Works as expected" $
+      [qy|
+        foo
+        {1+2}
+        bar
+      |] `shouldBe` "foo\n3\nbar"
+
+  describe "QV (QY but without interpolation)" $ do
+
+    it "Works as expected" $ do
+      [qv|
+        foo
+        {1+2}
+        bar
+      |] `shouldBe` "foo\n{1+2}\nbar"
+
+  describe "QK (interpolated string with line-breaks replaced with spaces)" $ do
+
+    it "Works as expected" $ do
+      [qk|
+        foo
+        {1+2}
+        bar
+      |] `shouldBe` "foo 3 bar"
+
+  describe "QL (QK but without interpolation)" $ do
+
+    it "Works as expected" $ do
+      [ql|
+        foo
+        {1+2}
+        bar
+      |] `shouldBe` "foo {1+2} bar"
+  -}
