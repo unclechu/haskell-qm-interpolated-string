@@ -9,5 +9,5 @@ end_of_line = lf
 indent_style = space
 indent_size = 2
 
-[test/*.hs]
+[test/**.hs]
 trim_trailing_whitespace = false

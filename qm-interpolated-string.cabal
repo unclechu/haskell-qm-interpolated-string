@@ -45,6 +45,10 @@ test-suite tests
 
   hs-source-dirs: test
   main-is:        Spec.hs
+  other-modules:  QM.Spec
+                , QN.Spec
+                , QY.Spec
+                , QV.Spec
   build-depends:  base ==4.*
                 , hspec ==2.*
                 , qm-interpolated-string

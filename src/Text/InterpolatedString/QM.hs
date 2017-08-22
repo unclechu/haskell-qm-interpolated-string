@@ -3,13 +3,13 @@
 
 {-# LANGUAGE PackageImports #-}
 
-module Text.InterpolatedString.QM (qm, qn, ShowQ(..)) where
+module Text.InterpolatedString.QM (qm, qn, qy, qv, ShowQ(..)) where
 
 import "template-haskell" Language.Haskell.TH.Quote (QuasiQuoter (QuasiQuoter))
 
 -- local imports
-import qualified Text.InterpolatedString.QM.Parsers as Parsers (qm, qn)
 import Text.InterpolatedString.QM.ShowQ.Class (ShowQ(..))
+import qualified Text.InterpolatedString.QM.Parsers as Parsers
 
 
 -- | QuasiQuoter for multiline interpolated string.
@@ -58,3 +58,19 @@ qn = QuasiQuoter Parsers.qn
   (error "Cannot use qn as a pattern")
   (error "Cannot use qn as a type")
   (error "Cannot use qn as a dec")
+
+
+-- TODO add description
+qy :: QuasiQuoter
+qy = QuasiQuoter Parsers.qy
+  (error "Cannot use qy as a pattern")
+  (error "Cannot use qy as a type")
+  (error "Cannot use qy as a dec")
+
+
+-- TODO add description
+qv :: QuasiQuoter
+qv = QuasiQuoter Parsers.qv
+  (error "Cannot use qv as a pattern")
+  (error "Cannot use qv as a type")
+  (error "Cannot use qv as a dec")

@@ -14,7 +14,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module Text.InterpolatedString.QM.Parsers (qm, qn) where
+module Text.InterpolatedString.QM.Parsers (qm, qn, qy, qv) where
 
 import "base" GHC.Exts (IsString (fromString))
 
@@ -41,16 +41,18 @@ instance (ShowQ a, IsString s) => QQ a s where
 
 data StringPart = Literal String | AntiQuote String deriving Show
 
-
-unQM :: String -> String -> [StringPart]
-unQM a ""          = [Literal (reverse a)]
-unQM a ('\\':x:xs) = unQM (x:a) xs
-unQM a ("\\")      = unQM ('\\':a) ""
-unQM a ('}':xs)    = AntiQuote (reverse a) : parseQM "" xs
-unQM a (x:xs)      = unQM (x:a) xs
+type Parser = String -> String -> [StringPart]
 
 
-parseQM :: String -> String -> [StringPart]
+unQX :: Parser -> Parser
+unQX _ a ""          = [Literal (reverse a)]
+unQX p a ('\\':x:xs) = unQX p (x:a) xs
+unQX p a ("\\")      = unQX p ('\\':a) ""
+unQX p a ('}':xs)    = AntiQuote (reverse a) : p "" xs
+unQX p a (x:xs)      = unQX p (x:a) xs
+
+
+parseQM :: Parser
 parseQM a ""             = [Literal (reverse a)]
 parseQM a ('\\':'\\':xs) = parseQM ('\\':a) xs
 parseQM a ('\\':'{':xs)  = parseQM ('{':a) xs
@@ -60,7 +62,7 @@ parseQM a ('\\':'n':xs)  = parseQM ('\n':a) xs
 parseQM a ('\\':'\t':xs) = parseQM ('\t':a) xs
 parseQM a ('\\':'t':xs)  = parseQM ('\t':a) xs
 parseQM a ("\\")         = parseQM ('\\':a) ""
-parseQM a ('{':xs)       = Literal (reverse a) : unQM "" xs
+parseQM a ('{':xs)       = Literal (reverse a) : (unQX parseQM) "" xs
 parseQM a (clearIndentAtSOF   -> Just clean) = parseQM a clean
 parseQM a (clearIndentTillEOF -> Just clean) = parseQM a clean
 parseQM a ('\n':xs)      = parseQM a xs -- cut off line breaks
@@ -70,7 +72,7 @@ qm :: String -> TH.ExpQ
 qm = makeExpr . parseQM "" . clearIndentAtStart . filter (/= '\r')
 
 
-parseQN :: String -> String -> [StringPart]
+parseQN :: Parser
 parseQN a ""             = [Literal (reverse a)]
 parseQN a ('\\':'\\':xs) = parseQN ('\\':a) xs
 parseQN a ('\\':' ':xs)  = parseQN (' ':a) xs
@@ -86,6 +88,20 @@ parseQN a (x:xs)         = parseQN (x:a) xs
 
 qn :: String -> TH.ExpQ
 qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
+
+
+parseQY :: Parser
+parseQY _ _ = []
+
+qy :: String -> TH.ExpQ
+qy = makeExpr . parseQY "" . clearIndentAtStart . filter (/= '\r')
+
+
+parseQV :: Parser
+parseQV _ _ = []
+
+qv :: String -> TH.ExpQ
+qv = makeExpr . parseQV "" . clearIndentAtStart . filter (/= '\r')
 
 
 clearIndentTillEOF :: String -> Maybe String
