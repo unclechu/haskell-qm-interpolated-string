@@ -27,7 +27,7 @@ import "base" Data.Monoid (mempty, mappend)
 #endif
 
 -- local imports
-import Text.InterpolatedString.QM.ShowQ.Class (ShowQ(..))
+import Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..))
 
 
 class QQ a string where
@@ -91,7 +91,19 @@ qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
 
 
 parseQY :: Parser
-parseQY _ _ = []
+parseQY a ""             = [Literal (reverse a)]
+parseQY a ('\\':'\\':xs) = parseQY ('\\':a) xs
+parseQY a ('\\':'{':xs)  = parseQY ('{':a) xs
+parseQY a ('\\':' ':xs)  = parseQY (' ':a) xs
+parseQY a ('\\':'\n':xs) = parseQY a xs -- explicitly slicing line-breaks
+parseQY a ('\\':'n':xs)  = parseQY ('\n':a) xs
+parseQY a ('\\':'\t':xs) = parseQY ('\t':a) xs
+parseQY a ('\\':'t':xs)  = parseQY ('\t':a) xs
+parseQY a ("\\")         = parseQY ('\\':a) ""
+parseQY a ('{':xs)       = Literal (reverse a) : (unQX parseQY) "" xs
+parseQY a (clearIndentAtSOF   -> Just clean) = parseQY a clean
+parseQY a (clearIndentTillEOF -> Just clean) = parseQY a clean
+parseQY a (x:xs)         = parseQY (x:a) xs
 
 qy :: String -> TH.ExpQ
 qy = makeExpr . parseQY "" . clearIndentAtStart . filter (/= '\r')
@@ -102,6 +114,13 @@ parseQV _ _ = []
 
 qv :: String -> TH.ExpQ
 qv = makeExpr . parseQV "" . clearIndentAtStart . filter (/= '\r')
+
+
+clearFirstQYLineBreak :: String -> Maybe String
+clearFirstQYLineBreak = undefined
+
+clearLastQYLineBreak :: String -> Maybe String
+clearLastQYLineBreak = undefined
 
 
 clearIndentTillEOF :: String -> Maybe String

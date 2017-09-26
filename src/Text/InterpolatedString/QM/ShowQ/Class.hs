@@ -9,7 +9,7 @@
 
 {-# LANGUAGE PackageImports #-}
 
-module Text.InterpolatedString.QM.ShowQ.Class (ShowQ(..)) where
+module Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..)) where
 
 import "bytestring" Data.ByteString.Char8 as Strict (ByteString, unpack)
 import "bytestring" Data.ByteString.Lazy.Char8 as Lazy (ByteString, unpack)

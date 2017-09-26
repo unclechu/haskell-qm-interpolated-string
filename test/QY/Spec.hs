@@ -19,7 +19,7 @@ spec = do
       bar
     |] `shouldBe` "foo\n3\nbar"
 
-  it "Slicing line break" $
+  it "Explicitly slicing line-breaks" $
     [qy|
       foo\
       {1+2}\

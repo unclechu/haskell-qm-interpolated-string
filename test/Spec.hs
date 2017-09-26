@@ -8,7 +8,7 @@ import "hspec" Test.Hspec (hspec, describe)
 -- local imports
 import qualified QM.Spec
 import qualified QN.Spec
--- import qualified QY.Spec
+import qualified QY.Spec
 -- import qualified QV.Spec
 
 
@@ -17,7 +17,7 @@ main = hspec $ do
 
   describe "QM" QM.Spec.spec
   describe "QN (QM but without interpolation)" QN.Spec.spec
-  -- describe "QY (interpolated string with line-breaks)" QY.Spec.spec
+  describe "QY (interpolated string with line-breaks)" QY.Spec.spec
   -- describe "QV (QY but without interpolation)" QV.Spec.spec
 
   {-

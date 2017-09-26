@@ -3,12 +3,12 @@
 
 {-# LANGUAGE PackageImports #-}
 
-module Text.InterpolatedString.QM (qm, qn, qy, qv, ShowQ(..)) where
+module Text.InterpolatedString.QM (qm, qn, qy, qv, ShowQ (..)) where
 
 import "template-haskell" Language.Haskell.TH.Quote (QuasiQuoter (QuasiQuoter))
 
 -- local imports
-import Text.InterpolatedString.QM.ShowQ.Class (ShowQ(..))
+import Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..))
 import qualified Text.InterpolatedString.QM.Parsers as Parsers
 
 

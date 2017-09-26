@@ -12,14 +12,14 @@ import "qm-interpolated-string" Text.InterpolatedString.QM (qv)
 spec :: Spec
 spec = do
 
-  it "Works as expected" $ do
+  it "Works as expected" $
     [qv|
       foo
       {1+2}
       bar
     |] `shouldBe` "foo\n{1+2}\nbar"
 
-  it "Slicing line break" $
+  it "Explicitly slicing line-breaks" $
     [qv|
       foo\
       {1+2}\
