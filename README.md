@@ -34,6 +34,25 @@ main = putStrLn [qm| hello
                    \ world |]
 ```
 
+## Tables
+
+### All QuasiQuoters
+
+| QuasiQuoter | Interpolation | Indentation | Line-breaks | Trailing whitespaces |
+|-------------|---------------|-------------|-------------|----------------------|
+| `qm`        | ✓             | Removed     | Removed     | Removed              |
+| `qn`        | ✗             | Removed     | Removed     | Removed              |
+| `qmb`       | ✓             | Removed     | Kept        | Removed              |
+| `qnb`       | ✗             | Removed     | Kept        | Removed              |
+
+### About naming logic
+
+| Contains in its name | What means                    | QuasiQuoters |
+|----------------------|-------------------------------|--------------|
+| `m`                  | Resolves interpolation blocks | `qm`, `qmb`  |
+| `n`                  | Without interpolation         | `qn`, `qnb`  |
+| `b`                  | Keeps line-breaks             | `qmb`, `qnb` |
+
 ## More examples
 
 ```haskell
