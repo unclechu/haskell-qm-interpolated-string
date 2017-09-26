@@ -73,6 +73,7 @@ qm :: String -> TH.ExpQ
 qm = makeExpr . parseQM "" . clearIndentAtStart . filter (/= '\r')
 
 
+-- Copy-pasted `parseQM` and removed lines where `{` or `}` are parsed
 parseQN :: Parser
 parseQN a ""             = [Literal (reverse a)]
 parseQN a ('\\':'\\':xs) = parseQN ('\\':a) xs
@@ -94,7 +95,7 @@ qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
 
 parseQMB :: Parser
 parseQMB a ""             = [Literal (reverse a)]
-parseQMB a (clearLastQMBLineBreak -> True) = parseQMB a  ""
+parseQMB a (clearLastQXBLineBreak -> True) = parseQMB a ""
 parseQMB a ('\\':'\\':xs) = parseQMB ('\\':a) xs
 parseQMB a ('\\':'{':xs)  = parseQMB ('{':a) xs
 parseQMB a ('\\':' ':xs)  = parseQMB (' ':a) xs
@@ -114,31 +115,49 @@ parseQMB a (x:xs)         = parseQMB (x:a) xs
 qmb :: String -> TH.ExpQ
 qmb = makeExpr
     . parseQMB ""
-    . clearFirstQMBLineBreak
+    . clearFirstQXBLineBreak
     . clearIndentAtStart
     . filter (/= '\r')
 
 
+-- Copy-pasted `parseQMB` and removed lines where `{` or `}` are parsed
 parseQNB :: Parser
-parseQNB _ _ = []
+parseQNB a ""             = [Literal (reverse a)]
+parseQNB a (clearLastQXBLineBreak -> True) = parseQNB a ""
+parseQNB a ('\\':'\\':xs) = parseQNB ('\\':a) xs
+parseQNB a ('\\':' ':xs)  = parseQNB (' ':a) xs
+parseQNB a ('\\':'\n':xs) = -- explicitly slicing line-breaks
+                            parseQNB a $ maybe xs tail
+                                       $ clearIndentAtSOF $ '\n' : xs
+parseQNB a ('\\':'n':xs)  = parseQNB ('\n':a) xs
+parseQNB a ('\\':'\t':xs) = parseQNB ('\t':a) xs
+parseQNB a ('\\':'t':xs)  = parseQNB ('\t':a) xs
+parseQNB a ("\\")         = parseQNB ('\\':a) ""
+parseQNB a (clearIndentAtSOF   -> Just clean) = parseQNB a clean
+parseQNB a (clearIndentTillEOF -> Just clean) = parseQNB a clean
+parseQNB a (x:xs)         = parseQNB (x:a) xs
 
 -- No interpolation block (line-breaks are kept, indentation is ignored)
 qnb :: String -> TH.ExpQ
-qnb = makeExpr . parseQNB "" . clearIndentAtStart . filter (/= '\r')
+qnb = makeExpr
+    . parseQNB ""
+    . clearFirstQXBLineBreak
+    . clearIndentAtStart
+    . filter (/= '\r')
 
 
-clearFirstQMBLineBreak :: String -> String
-clearFirstQMBLineBreak ""                          = ""
-clearFirstQMBLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
+clearFirstQXBLineBreak :: String -> String
+clearFirstQXBLineBreak ""                          = ""
+clearFirstQXBLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
                                 | otherwise        = s
   where cutOff ""                          = ""
         cutOff c@(y:ys) | y `elem` "\t\n " = cutOff ys
                         | otherwise        = c
 
-clearLastQMBLineBreak :: String -> Bool
+clearLastQXBLineBreak :: String -> Bool
 -- Cannot be empty (matched in `parseQMB`)
-clearLastQMBLineBreak ""                        = False
-clearLastQMBLineBreak (x:xs) | x `elem` "\t\n " = f xs
+clearLastQXBLineBreak ""                        = False
+clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
                              | otherwise        = False
   where f ""                        = True
         f (y:ys) | y `elem` "\t\n " = f ys

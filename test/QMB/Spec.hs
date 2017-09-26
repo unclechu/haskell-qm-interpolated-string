@@ -40,7 +40,7 @@ spec = do
             \ what's going on here?  |]
         `shouldBe` "hello world,\n what's going on here?"
 
-    it "Second (merging lines)" $
+    it "Second (breaking lines)" $
       [qmb|
             it's actual
             ly NOT ignored

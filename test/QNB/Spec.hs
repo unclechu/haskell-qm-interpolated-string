@@ -35,22 +35,22 @@ spec = do
 
   describe "Examples from README" $ do
 
-    it "First (decorative spacing and escaping space symbol, double-space)" $
+    it "First (decorative spacing and escaping space symbol)" $
       [qnb|   hello world,
             \ what's going on here?  |]
-        `shouldBe` "hello world,  what's going on here?"
+        `shouldBe` "hello world,\n what's going on here?"
 
-    it "Second (merging lines with spaces)" $
+    it "Second (breaking lines)" $
       [qnb|
             it's actual
             ly NOT ignored
          |]
-            `shouldBe` "it's actual ly ignored"
+            `shouldBe` "it's actual\nly NOT ignored"
 
     it "Third (explicit line-breaks symbols, line-break plus space)" $
       [qnb|  \  You could explicitly escape indentation or\n
                 line-breaks when you really need it!  \
-          |] `shouldBe` "  You could explicitly escape indentation or\n \
+          |] `shouldBe` "  You could explicitly escape indentation or\n\n\
                         \line-breaks when you really need it!  "
 
     it "Fourth (escaping interpolation blocks to show them as text)" $
@@ -68,7 +68,7 @@ spec = do
 
   it "Example from generated docs (double-space)" $
     [qnb| foo {'b':'a':'r':""}
-        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"}  baz"
+        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"}\n baz"
 
   it "Escaping backslashes" $ do [qnb| foo\bar |]    `shouldBe` "foo\\bar"
                                  [qnb| foo\\bar |]   `shouldBe` "foo\\bar"
@@ -77,9 +77,9 @@ spec = do
 
   it "Empty string" $ [qnb|  |] `shouldBe` ""
 
-  it "Escaping space by slash at EOL after space (double-space)" $
+  it "Escaping space by slash at EOL after space (line-break is sliced)" $
     [qnb| foo \
-          bar |] `shouldBe` "foo  bar"
+          bar |] `shouldBe` "foo bar"
 
   it "Escaped spaces at the edges" $ do [qnb| foo\ |] `shouldBe` "foo "
                                         [qnb|\ foo |] `shouldBe` " foo"
