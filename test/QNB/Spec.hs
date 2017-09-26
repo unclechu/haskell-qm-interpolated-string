@@ -19,12 +19,18 @@ spec = do
       bar
     |] `shouldBe` "foo\n{1+2}\nbar"
 
-  it "Explicitly slicing line-breaks" $
+  it "Explicitly slicing line-breaks" $ do
     [qnb|
       foo\
       {1+2}\
       bar\
       baz
+    |] `shouldBe` "foo{1+2}barbaz"
+    [qnb|
+      foo\
+      {1+2}\
+      bar\
+      baz\
     |] `shouldBe` "foo{1+2}barbaz"
 
   describe "Examples from README" $ do
@@ -62,7 +68,7 @@ spec = do
 
   it "Example from generated docs (double-space)" $
     [qnb| foo {'b':'a':'r':""}
-        \ baz |] `shouldBe` "foo  {'b':'a':'r':\"\"} baz"
+        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"}  baz"
 
   it "Escaping backslashes" $ do [qnb| foo\bar |]    `shouldBe` "foo\\bar"
                                  [qnb| foo\\bar |]   `shouldBe` "foo\\bar"
@@ -100,3 +106,18 @@ spec = do
       [qnb|	foo		\	|]   `shouldBe` "foo\t\t\t"
       [qnb|	foo	\		|]   `shouldBe` "foo\t\t"
       [qnb|	foo\			|] `shouldBe` "foo\t"
+
+  it "Tails" $ do
+    [qnb|    
+           foo   
+                 |] `shouldBe` "foo"
+    [qnb|	 
+         	
+          foo	 
+               
+             	
+                 |] `shouldBe` "foo"
+    [qnb|				
+            foo			
+            				
+            				|] `shouldBe` "foo"

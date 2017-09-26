@@ -94,10 +94,13 @@ qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
 
 parseQMB :: Parser
 parseQMB a ""             = [Literal (reverse a)]
+parseQMB a (clearLastQMBLineBreak -> True) = parseQMB a  ""
 parseQMB a ('\\':'\\':xs) = parseQMB ('\\':a) xs
 parseQMB a ('\\':'{':xs)  = parseQMB ('{':a) xs
 parseQMB a ('\\':' ':xs)  = parseQMB (' ':a) xs
-parseQMB a ('\\':'\n':xs) = parseQMB a xs -- explicitly slicing line-breaks
+parseQMB a ('\\':'\n':xs) = -- explicitly slicing line-breaks
+                            parseQMB a $ maybe xs tail
+                                       $ clearIndentAtSOF $ '\n' : xs
 parseQMB a ('\\':'n':xs)  = parseQMB ('\n':a) xs
 parseQMB a ('\\':'\t':xs) = parseQMB ('\t':a) xs
 parseQMB a ('\\':'t':xs)  = parseQMB ('\t':a) xs
@@ -109,7 +112,11 @@ parseQMB a (x:xs)         = parseQMB (x:a) xs
 
 -- With interpolation blocks (line-breaks are kept, indentation is ignored)
 qmb :: String -> TH.ExpQ
-qmb = makeExpr . parseQMB "" . clearIndentAtStart . filter (/= '\r')
+qmb = makeExpr
+    . parseQMB ""
+    . clearFirstQMBLineBreak
+    . clearIndentAtStart
+    . filter (/= '\r')
 
 
 parseQNB :: Parser
@@ -120,41 +127,52 @@ qnb :: String -> TH.ExpQ
 qnb = makeExpr . parseQNB "" . clearIndentAtStart . filter (/= '\r')
 
 
-clearFirstQMBLineBreak :: String -> Maybe String
-clearFirstQMBLineBreak = undefined
+clearFirstQMBLineBreak :: String -> String
+clearFirstQMBLineBreak ""                          = ""
+clearFirstQMBLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
+                                | otherwise        = s
+  where cutOff ""                          = ""
+        cutOff c@(y:ys) | y `elem` "\t\n " = cutOff ys
+                        | otherwise        = c
 
-clearLastQMBLineBreak :: String -> Maybe String
-clearLastQMBLineBreak = undefined
+clearLastQMBLineBreak :: String -> Bool
+-- Cannot be empty (matched in `parseQMB`)
+clearLastQMBLineBreak ""                        = False
+clearLastQMBLineBreak (x:xs) | x `elem` "\t\n " = f xs
+                             | otherwise        = False
+  where f ""                        = True
+        f (y:ys) | y `elem` "\t\n " = f ys
+                 | otherwise        = False
 
 
 clearIndentTillEOF :: String -> Maybe String
-clearIndentTillEOF s | s == ""             = Nothing
-                     | head s `elem` "\t " = cutOff s
-                     | otherwise           = Nothing
+clearIndentTillEOF ""                       = Nothing
+clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
+                           | otherwise      = Nothing
 
-  where cutOff x | x == ""             = Just ""
-                 | head x == '\n'      = Just x
-                 | head x `elem` "\t " = cutOff $ tail x
-                 | otherwise           = Nothing
+  where cutOff ""                      = Just ""
+        cutOff c@('\n':_)              = Just c
+        cutOff (y:ys) | y `elem` "\t " = cutOff ys
+                      | otherwise      = Nothing
 
 
 clearIndentAtSOF :: String -> Maybe String
-clearIndentAtSOF s | s == ""                      = Nothing
-                   | head s == '\n' && hasChanges = Just processed
-                   | otherwise                    = Nothing
+clearIndentAtSOF ""                                 = Nothing
+clearIndentAtSOF s@(x:xs) | x == '\n' && hasChanges = Just processed
+                          | otherwise               = Nothing
 
-  where processed  = '\n' : cutOff (tail s)
+  where processed  = '\n' : cutOff xs
         hasChanges = processed /= s
 
-        cutOff x | x == ""             = ""
-                 | head x `elem` "\t " = cutOff $ tail x
-                 | otherwise           = x
+        cutOff ""                        = ""
+        cutOff c@(y:ys) | y `elem` "\t " = cutOff ys
+                        | otherwise      = c
 
 
 clearIndentAtStart :: String -> String
-clearIndentAtStart s | s == ""             = ""
-                     | head s `elem` "\t " = clearIndentAtStart $ tail s
-                     | otherwise           = s
+clearIndentAtStart ""                        = ""
+clearIndentAtStart s@(x:xs) | x `elem` "\t " = clearIndentAtStart xs
+                            | otherwise      = s
 
 
 makeExpr :: [StringPart] -> TH.ExpQ

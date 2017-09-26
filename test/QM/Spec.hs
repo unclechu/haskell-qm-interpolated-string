@@ -81,3 +81,18 @@ spec = do
       [qm|	foo		\	|]   `shouldBe` "foo\t\t\t"
       [qm|	foo	\		|]   `shouldBe` "foo\t\t"
       [qm|	foo\			|] `shouldBe` "foo\t"
+
+  it "Tails" $ do
+    [qm|    
+           foo   
+                 |] `shouldBe` "foo"
+    [qm|	 
+         	
+          foo	 
+               
+             	
+                 |] `shouldBe` "foo"
+    [qm|				
+            foo			
+            				
+            				|] `shouldBe` "foo"
