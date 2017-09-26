@@ -47,8 +47,10 @@ test-suite tests
   main-is:        Spec.hs
   other-modules:  QM.Spec
                 , QN.Spec
-                , QY.Spec
-                , QV.Spec
+                , QMB.Spec
+                , QNB.Spec
+                --, QMS.Spec
+                --, QNS.Spec
   build-depends:  base ==4.*
                 , hspec ==2.*
                 , qm-interpolated-string

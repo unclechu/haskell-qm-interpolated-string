@@ -3,7 +3,7 @@
 
 {-# LANGUAGE PackageImports #-}
 
-module Text.InterpolatedString.QM (qm, qn, qy, qv, ShowQ (..)) where
+module Text.InterpolatedString.QM (qm, qn, qmb, qnb, ShowQ (..)) where
 
 import "template-haskell" Language.Haskell.TH.Quote (QuasiQuoter (QuasiQuoter))
 
@@ -36,9 +36,9 @@ import qualified Text.InterpolatedString.QM.Parsers as Parsers
 --
 qm :: QuasiQuoter
 qm = QuasiQuoter Parsers.qm
-  (error "Cannot use qm as a pattern")
-  (error "Cannot use qm as a type")
-  (error "Cannot use qm as a dec")
+  (error "Cannot use 'qm' as a pattern")
+  (error "Cannot use 'qm' as a type")
+  (error "Cannot use 'qm' as a dec")
 
 
 -- | Works just like `qm` but without interpolation
@@ -55,22 +55,22 @@ qm = QuasiQuoter Parsers.qm
 --
 qn :: QuasiQuoter
 qn = QuasiQuoter Parsers.qn
-  (error "Cannot use qn as a pattern")
-  (error "Cannot use qn as a type")
-  (error "Cannot use qn as a dec")
+  (error "Cannot use 'qn' as a pattern")
+  (error "Cannot use 'qn' as a type")
+  (error "Cannot use 'qn' as a dec")
 
 
 -- TODO add description
-qy :: QuasiQuoter
-qy = QuasiQuoter Parsers.qy
-  (error "Cannot use qy as a pattern")
-  (error "Cannot use qy as a type")
-  (error "Cannot use qy as a dec")
+qmb :: QuasiQuoter
+qmb = QuasiQuoter Parsers.qmb
+  (error "Cannot use 'qmb' as a pattern")
+  (error "Cannot use 'qmb' as a type")
+  (error "Cannot use 'qmb' as a dec")
 
 
 -- TODO add description
-qv :: QuasiQuoter
-qv = QuasiQuoter Parsers.qv
-  (error "Cannot use qv as a pattern")
-  (error "Cannot use qv as a type")
-  (error "Cannot use qv as a dec")
+qnb :: QuasiQuoter
+qnb = QuasiQuoter Parsers.qnb
+  (error "Cannot use 'qnb' as a pattern")
+  (error "Cannot use 'qnb' as a type")
+  (error "Cannot use 'qnb' as a dec")

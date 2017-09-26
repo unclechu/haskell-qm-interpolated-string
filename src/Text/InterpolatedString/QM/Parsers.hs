@@ -14,7 +14,7 @@
 
 {-# LANGUAGE CPP #-}
 
-module Text.InterpolatedString.QM.Parsers (qm, qn, qy, qv) where
+module Text.InterpolatedString.QM.Parsers (qm, qn, qmb, qnb) where
 
 import "base" GHC.Exts (IsString (fromString))
 
@@ -68,6 +68,7 @@ parseQM a (clearIndentTillEOF -> Just clean) = parseQM a clean
 parseQM a ('\n':xs)      = parseQM a xs -- cut off line breaks
 parseQM a (x:xs)         = parseQM (x:a) xs
 
+-- With interpolation blocks (line-breaks and indentation are ignored)
 qm :: String -> TH.ExpQ
 qm = makeExpr . parseQM "" . clearIndentAtStart . filter (/= '\r')
 
@@ -86,41 +87,44 @@ parseQN a (clearIndentTillEOF -> Just clean) = parseQN a clean
 parseQN a ('\n':xs)      = parseQN a xs -- cut off line breaks
 parseQN a (x:xs)         = parseQN (x:a) xs
 
+-- No interpolation block (line-breaks and indentation are ignored)
 qn :: String -> TH.ExpQ
 qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
 
 
-parseQY :: Parser
-parseQY a ""             = [Literal (reverse a)]
-parseQY a ('\\':'\\':xs) = parseQY ('\\':a) xs
-parseQY a ('\\':'{':xs)  = parseQY ('{':a) xs
-parseQY a ('\\':' ':xs)  = parseQY (' ':a) xs
-parseQY a ('\\':'\n':xs) = parseQY a xs -- explicitly slicing line-breaks
-parseQY a ('\\':'n':xs)  = parseQY ('\n':a) xs
-parseQY a ('\\':'\t':xs) = parseQY ('\t':a) xs
-parseQY a ('\\':'t':xs)  = parseQY ('\t':a) xs
-parseQY a ("\\")         = parseQY ('\\':a) ""
-parseQY a ('{':xs)       = Literal (reverse a) : (unQX parseQY) "" xs
-parseQY a (clearIndentAtSOF   -> Just clean) = parseQY a clean
-parseQY a (clearIndentTillEOF -> Just clean) = parseQY a clean
-parseQY a (x:xs)         = parseQY (x:a) xs
+parseQMB :: Parser
+parseQMB a ""             = [Literal (reverse a)]
+parseQMB a ('\\':'\\':xs) = parseQMB ('\\':a) xs
+parseQMB a ('\\':'{':xs)  = parseQMB ('{':a) xs
+parseQMB a ('\\':' ':xs)  = parseQMB (' ':a) xs
+parseQMB a ('\\':'\n':xs) = parseQMB a xs -- explicitly slicing line-breaks
+parseQMB a ('\\':'n':xs)  = parseQMB ('\n':a) xs
+parseQMB a ('\\':'\t':xs) = parseQMB ('\t':a) xs
+parseQMB a ('\\':'t':xs)  = parseQMB ('\t':a) xs
+parseQMB a ("\\")         = parseQMB ('\\':a) ""
+parseQMB a ('{':xs)       = Literal (reverse a) : (unQX parseQMB) "" xs
+parseQMB a (clearIndentAtSOF   -> Just clean) = parseQMB a clean
+parseQMB a (clearIndentTillEOF -> Just clean) = parseQMB a clean
+parseQMB a (x:xs)         = parseQMB (x:a) xs
 
-qy :: String -> TH.ExpQ
-qy = makeExpr . parseQY "" . clearIndentAtStart . filter (/= '\r')
-
-
-parseQV :: Parser
-parseQV _ _ = []
-
-qv :: String -> TH.ExpQ
-qv = makeExpr . parseQV "" . clearIndentAtStart . filter (/= '\r')
+-- With interpolation blocks (line-breaks are kept, indentation is ignored)
+qmb :: String -> TH.ExpQ
+qmb = makeExpr . parseQMB "" . clearIndentAtStart . filter (/= '\r')
 
 
-clearFirstQYLineBreak :: String -> Maybe String
-clearFirstQYLineBreak = undefined
+parseQNB :: Parser
+parseQNB _ _ = []
 
-clearLastQYLineBreak :: String -> Maybe String
-clearLastQYLineBreak = undefined
+-- No interpolation block (line-breaks are kept, indentation is ignored)
+qnb :: String -> TH.ExpQ
+qnb = makeExpr . parseQNB "" . clearIndentAtStart . filter (/= '\r')
+
+
+clearFirstQMBLineBreak :: String -> Maybe String
+clearFirstQMBLineBreak = undefined
+
+clearLastQMBLineBreak :: String -> Maybe String
+clearLastQMBLineBreak = undefined
 
 
 clearIndentTillEOF :: String -> Maybe String
