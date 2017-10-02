@@ -4,131 +4,161 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
+{-# LANGUAGE LambdaCase #-}
 
 module Text.InterpolatedString.QM.TH
   ( StringPart (..)
+  , LineBreaks (..)
+  , parserTpl
+
   , Parser
-  , tplParseQM
   , unQX
   , clearIndentAtSOF
   , clearIndentTillEOF
+  , clearLastQXBLineBreak
   ) where
 
 import qualified "template-haskell" Language.Haskell.TH as TH
-import "base" Control.Arrow ((&&&))
 
 
 data Decl
-  = Decl
-  { c :: Bool   -- (c)ondition
-  , p :: TH.Pat -- (p)attern
-  , e :: TH.Exp -- (e)xpression
-  }
+  = C (Bool, TH.Pat, TH.Exp)
+  | D (TH.Pat, TH.Exp)
+  deriving (Show, Eq)
+
+
+data LineBreaks
+  = IgnoreLineBreaks
+  | KeepLineBreaks
+  | ReplaceLineBreaksWithSpaces -- TODO implement
   deriving (Show, Eq)
 
 
 data StringPart = Literal String | AntiQuote String deriving Show
-
 type Parser = String -> String -> [StringPart]
 
 
-tplParseQM :: String
-           -- ^ Parser name
-           -> Bool
-           -- ^ Enable interpolation
-           -> TH.DecsQ
-tplParseQM (TH.mkName -> n) withInterpolation = return
+parserTpl :: String
+          -- ^ Parser name
+          -> Bool
+          -- ^ Enable interpolation
+          -> LineBreaks
+          -> TH.DecsQ
+parserTpl (TH.mkName -> n) withInterpolation lineBreaks = return
 
   [ TH.SigD n (TH.ConT $ TH.mkName "Parser")
-  , TH.FunD n $ map (uncurry f . (p &&& e)) decls
+  , TH.FunD n decls
   ]
 
-  where decls = filter c
-          [ d { p = lp []
-              , e = le [apps [ce "Literal", apps [ve "reverse", av]]]
-              }
+  where
 
-          , d { p = consP [chrP '\\', chrP '\\', vp "xs"]
-              , e = apps [fe, consE [chrE '\\', av], ve "xs"]
-              }
+    decls =
 
-          , d { c = withInterpolation
-              , p = consP [chrP '\\', chrP '{', vp "xs"]
-              , e = apps [fe, consE [chrE '{', av], ve "xs"]
-              }
+      map    (uncurry f) $
+      map    (\case C (_, x, y) -> (x, y) ; D x -> x   ) $
+      filter (\case C (x, _, _) -> x      ; D _ -> True)
 
-          , d { p = consP [chrP '\\', chrP ' ', vp "xs"]
-              , e = apps [fe, consE [chrE ' ', av], ve "xs"]
-              }
+      [ D ( lp []
+          , le [apps [ce "Literal", apps [ve "reverse", ae]]]
+          )
 
-          , d { p = consP [chrP '\\', chrP '\n', vp "xs"]
-              , e = apps [fe, av, consE [chrE '\n', ve "xs"]]
-              }
+      , C ( lineBreaks == KeepLineBreaks
+          , TH.ViewP (ve "clearLastQXBLineBreak") $ cp "True" []
+          , apps [fe, ae, strE ""]
+          )
 
-          , d { p = consP [chrP '\\', chrP 'n', vp "xs"]
-              , e = apps [fe, consE [chrE '\n', av], ve "xs"]
-              }
+      , D ( consP [chrP '\\', chrP '\\', vp "xs"]
+          , apps [fe, consE [chrE '\\', ae], ve "xs"]
+          )
 
-          , d { p = consP [chrP '\\', chrP '\t', vp "xs"]
-              , e = apps [fe, consE [chrE '\t', av], ve "xs"]
-              }
+      , C ( withInterpolation
+          , consP [chrP '\\', chrP '{', vp "xs"]
+          , apps [fe, consE [chrE '{', ae], ve "xs"]
+          )
 
-          , d { p = consP [chrP '\\', chrP 't', vp "xs"]
-              , e = apps [fe, consE [chrE '\t', av], ve "xs"]
-              }
+      , D ( consP [chrP '\\', chrP ' ', vp "xs"]
+          , apps [fe, consE [chrE ' ', ae], ve "xs"]
+          )
 
-          , d { p = strP "\\"
-              , e = apps [fe, consE [chrE '\\', av], strE ""]
-              }
+      , C ( lineBreaks == IgnoreLineBreaks
+          , consP [chrP '\\', chrP '\n', vp "xs"]
+          , apps [fe, ae, consE [chrE '\n', ve "xs"]]
+          )
 
-          , d { c = withInterpolation
-              , p = consP [chrP '{', vp "xs"]
-              , e = consE [ apps [ce "Literal", apps [ve "reverse", av]]
-                          , apps [ve "unQX", fe, strE "", ve "xs"]
-                          ]
-              }
+        -- Explicitly slicing line-breaks
+      , C ( lineBreaks == KeepLineBreaks
+          , consP [chrP '\\', chrP '\n', vp "xs"]
+          , apps [apps [fe, ae, apps [ ve "maybe", ve "xs", ve "tail"
+                                     , apps [ ve "clearIndentAtSOF"
+                                            , consE [chrE '\n', ve "xs"]
+                                            ]]]]
+          )
 
-          , d { p = TH.ViewP (ve "clearIndentAtSOF") $ cp "Just" [vp "clean"]
-              , e = apps [fe, av, ve "clean"]
-              }
+      , D ( consP [chrP '\\', chrP 'n', vp "xs"]
+          , apps [fe, consE [chrE '\n', ae], ve "xs"]
+          )
 
-          , d { p = TH.ViewP (ve "clearIndentTillEOF") $ cp "Just" [vp "clean"]
-              , e = apps [fe, av, ve "clean"]
-              }
+      , D ( consP [chrP '\\', chrP '\t', vp "xs"]
+          , apps [fe, consE [chrE '\t', ae], ve "xs"]
+          )
 
-            -- Cutting off line-breaks
-          , d { p = consP [chrP '\n', vp "xs"]
-              , e = apps [fe, av, ve "xs"]
-              }
+      , D ( consP [chrP '\\', chrP 't', vp "xs"]
+          , apps [fe, consE [chrE '\t', ae], ve "xs"]
+          )
 
-          , d { p = consP [vp "x", vp "xs"]
-              , e = apps [fe, consE [ve "x", av], ve "xs"]
-              }
-          ]
+      , D ( strP "\\"
+          , apps [fe, consE [chrE '\\', ae], strE ""]
+          )
 
-        fe = TH.VarE n
-        a = TH.mkName "a" ; ap = TH.VarP a ; av = TH.VarE a
+      , C ( withInterpolation
+          , consP [chrP '{', vp "xs"]
+          , consE [ apps [ce "Literal", apps [ve "reverse", ae]]
+                  , apps [ve "unQX", fe, strE "", ve "xs"]
+                  ]
+          )
 
-        vp = TH.VarP . TH.mkName ; ve = TH.VarE . TH.mkName
-        cp = TH.ConP . TH.mkName ; ce = TH.ConE . TH.mkName
-        lp = TH.ListP            ; le = TH.ListE
+      , D ( TH.ViewP (ve "clearIndentAtSOF") $ cp "Just" [vp "clean"]
+          , apps [fe, ae, ve "clean"]
+          )
 
-        chrP = TH.LitP . TH.CharL   ; chrE = TH.LitE . TH.CharL
-        strP = TH.LitP . TH.StringL ; strE = TH.LitE . TH.StringL
+      , D ( TH.ViewP (ve "clearIndentTillEOF") $ cp "Just" [vp "clean"]
+          , apps [fe, ae, ve "clean"]
+          )
 
-        f pat body = TH.Clause (ap : pat : []) (TH.NormalB body) []
+        -- Cutting off line-breaks
+      , C ( lineBreaks == IgnoreLineBreaks
+          , consP [chrP '\n', vp "xs"]
+          , apps [fe, ae, ve "xs"]
+          )
 
-        apps [x] = x
-        apps (x:y:zs) = apps $ TH.AppE x y : zs
-        apps [] = error "apps []"
+      , D ( consP [vp "x", vp "xs"]
+          , apps [fe, consE [ve "x", ae], ve "xs"]
+          )
+      ]
 
-        consP [x] = x
-        consP (x:y:zs) = consP $ TH.UInfixP x (TH.mkName ":") y : zs
-        consP [] = error "consP []"
+    fe = TH.VarE n
+    a = TH.mkName "a" ; ap = TH.VarP a ; ae = TH.VarE a
 
-        consE [x] = x
-        consE (x:y:zs) = consE $ TH.UInfixE x (ce ":") y : zs
-        consE [] = error "consE []"
+    vp = TH.VarP . TH.mkName ; ve = TH.VarE . TH.mkName
+    cp = TH.ConP . TH.mkName ; ce = TH.ConE . TH.mkName
+    lp = TH.ListP            ; le = TH.ListE
+
+    chrP = TH.LitP . TH.CharL   ; chrE = TH.LitE . TH.CharL
+    strP = TH.LitP . TH.StringL ; strE = TH.LitE . TH.StringL
+
+    f pat body = TH.Clause (ap : pat : []) (TH.NormalB body) []
+
+    apps [x] = x
+    apps (x:y:zs) = apps $ TH.AppE x y : zs
+    apps [] = error "apps []"
+
+    consP [x] = x
+    consP (x:y:zs) = consP $ TH.UInfixP x (TH.mkName ":") y : zs
+    consP [] = error "consP []"
+
+    consE [x] = x
+    consE (x:y:zs) = consE $ TH.UInfixE x (ce ":") y : zs
+    consE [] = error "consE []"
 
 
 -- Parser for interpolation block
@@ -164,6 +194,12 @@ clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
                       | otherwise      = Nothing
 
 
--- Default value
-d :: Decl
-d = Decl { c = True, p = TH.WildP, e = TH.VarE $ TH.mkName "_" }
+clearLastQXBLineBreak :: String -> Bool
+-- Cannot be empty (matched in `parseQMB`)
+clearLastQXBLineBreak ""                        = False
+clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
+                             | otherwise        = False
+
+  where f ""                        = True
+        f (y:ys) | y `elem` "\t\n " = f ys
+                 | otherwise        = False
