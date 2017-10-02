@@ -6,12 +6,12 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 
-module Text.InterpolatedString.QM.Parsers.TH (parserTpl) where
+module Text.InterpolatedString.QM.Internal.Parsers.TH (parserTpl) where
 
 import qualified "template-haskell" Language.Haskell.TH as TH
 
 -- local imports
-import Text.InterpolatedString.QM.Parsers.Types (LineBreaks (..))
+import Text.InterpolatedString.QM.Internal.Parsers.Types (LineBreaks (..))
 
 
 data Decl

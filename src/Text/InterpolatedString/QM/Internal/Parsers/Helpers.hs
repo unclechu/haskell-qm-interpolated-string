@@ -11,7 +11,7 @@
 {-# LANGUAGE IncoherentInstances #-}
 {-# LANGUAGE FlexibleInstances #-}
 
-module Text.InterpolatedString.QM.Parsers.Helpers
+module Text.InterpolatedString.QM.Internal.Parsers.Helpers
   ( unQX
   , clearIndentAtStart
   , clearIndentAtSOF
@@ -31,8 +31,12 @@ import "base" Data.Monoid (mempty, mappend)
 #endif
 
 -- local imports
+
 import Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..))
-import Text.InterpolatedString.QM.Parsers.Types (Parser, StringPart (..))
+
+import Text.InterpolatedString.QM.Internal.Parsers.Types ( Parser
+                                                         , StringPart (..)
+                                                         )
 
 
 class QQ a string where

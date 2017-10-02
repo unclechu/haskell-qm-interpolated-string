@@ -5,27 +5,28 @@
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
 
-module Text.InterpolatedString.QM.Parsers (qm, qn, qmb, qnb) where
+module Text.InterpolatedString.QM.Internal.Parsers (qm, qn, qmb, qnb) where
 
 import qualified "template-haskell" Language.Haskell.TH as TH
 
 -- local imports
 
-import Text.InterpolatedString.QM.Parsers.TH (parserTpl)
+import Text.InterpolatedString.QM.Internal.Parsers.TH (parserTpl)
 
-import Text.InterpolatedString.QM.Parsers.Types ( Parser
-                                                , StringPart (..)
-                                                , LineBreaks (..)
-                                                )
+import Text.InterpolatedString.QM.Internal.Parsers.Types ( Parser
+                                                         , StringPart (..)
+                                                         , LineBreaks (..)
+                                                         )
 
-import Text.InterpolatedString.QM.Parsers.Helpers ( unQX
-                                                  , clearIndentAtStart
-                                                  , clearIndentAtSOF
-                                                  , clearIndentTillEOF
-                                                  , clearFirstQXBLineBreak
-                                                  , clearLastQXBLineBreak
-                                                  , makeExpr
-                                                  )
+import Text.InterpolatedString.QM.Internal.Parsers.Helpers
+  ( unQX
+  , clearIndentAtStart
+  , clearIndentAtSOF
+  , clearIndentTillEOF
+  , clearFirstQXBLineBreak
+  , clearLastQXBLineBreak
+  , makeExpr
+  )
 
 
 $(parserTpl "parseQM"  True  IgnoreLineBreaks)

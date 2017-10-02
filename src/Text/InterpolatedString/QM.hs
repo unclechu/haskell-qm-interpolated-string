@@ -9,7 +9,7 @@ import "template-haskell" Language.Haskell.TH.Quote (QuasiQuoter (QuasiQuoter))
 
 -- local imports
 import Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..))
-import qualified Text.InterpolatedString.QM.Parsers as Parsers
+import qualified Text.InterpolatedString.QM.Internal.Parsers as Parsers
 
 
 -- | QuasiQuoter for multiline interpolated string.
