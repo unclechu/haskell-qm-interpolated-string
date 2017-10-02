@@ -27,7 +27,16 @@ import "base" Data.Monoid (mempty, mappend)
 #endif
 
 -- local imports
+
 import Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..))
+
+import Text.InterpolatedString.QM.TH ( StringPart (..)
+                                     , Parser
+                                     , tplParseQM
+                                     , unQX
+                                     , clearIndentAtSOF
+                                     , clearIndentTillEOF
+                                     )
 
 
 class QQ a string where
@@ -39,19 +48,11 @@ instance IsString s => QQ s s where
 instance (ShowQ a, IsString s) => QQ a s where
   toQQ = fromString . showQ
 
-data StringPart = Literal String | AntiQuote String deriving Show
 
-type Parser = String -> String -> [StringPart]
+$(tplParseQM "parseQM" True)
+$(tplParseQM "parseQN" False)
 
-
-unQX :: Parser -> Parser
-unQX _ a ""          = [Literal (reverse a)]
-unQX p a ('\\':x:xs) = unQX p (x:a) xs
-unQX p a ("\\")      = unQX p ('\\':a) ""
-unQX p a ('}':xs)    = AntiQuote (reverse a) : p "" xs
-unQX p a (x:xs)      = unQX p (x:a) xs
-
-
+{-
 parseQM :: Parser
 parseQM a ""             = [Literal (reverse a)]
 parseQM a ('\\':'\\':xs) = parseQM ('\\':a) xs
@@ -67,6 +68,7 @@ parseQM a (clearIndentAtSOF   -> Just clean) = parseQM a clean
 parseQM a (clearIndentTillEOF -> Just clean) = parseQM a clean
 parseQM a ('\n':xs)      = parseQM a xs -- cut off line breaks
 parseQM a (x:xs)         = parseQM (x:a) xs
+-}
 
 -- With interpolation blocks (line-breaks and indentation are ignored)
 qm :: String -> TH.ExpQ
@@ -74,6 +76,7 @@ qm = makeExpr . parseQM "" . clearIndentAtStart . filter (/= '\r')
 
 
 -- Copy-pasted `parseQM` and removed lines where `{` or `}` are parsed
+{-
 parseQN :: Parser
 parseQN a ""             = [Literal (reverse a)]
 parseQN a ('\\':'\\':xs) = parseQN ('\\':a) xs
@@ -87,6 +90,7 @@ parseQN a (clearIndentAtSOF   -> Just clean) = parseQN a clean
 parseQN a (clearIndentTillEOF -> Just clean) = parseQN a clean
 parseQN a ('\n':xs)      = parseQN a xs -- cut off line breaks
 parseQN a (x:xs)         = parseQN (x:a) xs
+-}
 
 -- No interpolation block (line-breaks and indentation are ignored)
 qn :: String -> TH.ExpQ
@@ -162,30 +166,6 @@ clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
   where f ""                        = True
         f (y:ys) | y `elem` "\t\n " = f ys
                  | otherwise        = False
-
-
-clearIndentTillEOF :: String -> Maybe String
-clearIndentTillEOF ""                       = Nothing
-clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
-                           | otherwise      = Nothing
-
-  where cutOff ""                      = Just ""
-        cutOff c@('\n':_)              = Just c
-        cutOff (y:ys) | y `elem` "\t " = cutOff ys
-                      | otherwise      = Nothing
-
-
-clearIndentAtSOF :: String -> Maybe String
-clearIndentAtSOF ""                                 = Nothing
-clearIndentAtSOF s@(x:xs) | x == '\n' && hasChanges = Just processed
-                          | otherwise               = Nothing
-
-  where processed  = '\n' : cutOff xs
-        hasChanges = processed /= s
-
-        cutOff ""                        = ""
-        cutOff c@(y:ys) | y `elem` "\t " = cutOff ys
-                        | otherwise      = c
 
 
 clearIndentAtStart :: String -> String
