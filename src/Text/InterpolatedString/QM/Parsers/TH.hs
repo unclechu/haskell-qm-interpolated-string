@@ -6,36 +6,18 @@
 {-# LANGUAGE ViewPatterns #-}
 {-# LANGUAGE LambdaCase #-}
 
-module Text.InterpolatedString.QM.TH
-  ( StringPart (..)
-  , LineBreaks (..)
-  , parserTpl
-
-  , Parser
-  , unQX
-  , clearIndentAtSOF
-  , clearIndentTillEOF
-  , clearLastQXBLineBreak
-  ) where
+module Text.InterpolatedString.QM.Parsers.TH (parserTpl) where
 
 import qualified "template-haskell" Language.Haskell.TH as TH
+
+-- local imports
+import Text.InterpolatedString.QM.Parsers.Types (LineBreaks (..))
 
 
 data Decl
   = C (Bool, TH.Pat, TH.Exp)
   | D (TH.Pat, TH.Exp)
   deriving (Show, Eq)
-
-
-data LineBreaks
-  = IgnoreLineBreaks
-  | KeepLineBreaks
-  | ReplaceLineBreaksWithSpaces -- TODO implement
-  deriving (Show, Eq)
-
-
-data StringPart = Literal String | AntiQuote String deriving Show
-type Parser = String -> String -> [StringPart]
 
 
 parserTpl :: String
@@ -159,47 +141,3 @@ parserTpl (TH.mkName -> n) withInterpolation lineBreaks = return
     consE [x] = x
     consE (x:y:zs) = consE $ TH.UInfixE x (ce ":") y : zs
     consE [] = error "consE []"
-
-
--- Parser for interpolation block
-unQX :: Parser -> Parser
-unQX _ a ""          = [Literal (reverse a)]
-unQX f a ('\\':x:xs) = unQX f (x:a) xs
-unQX f a ("\\")      = unQX f ('\\':a) ""
-unQX f a ('}':xs)    = AntiQuote (reverse a) : f "" xs
-unQX f a (x:xs)      = unQX f (x:a) xs
-
-
-clearIndentAtSOF :: String -> Maybe String
-clearIndentAtSOF ""                                 = Nothing
-clearIndentAtSOF s@(x:xs) | x == '\n' && hasChanges = Just processed
-                          | otherwise               = Nothing
-
-  where processed  = '\n' : cutOff xs
-        hasChanges = processed /= s
-
-        cutOff ""                        = ""
-        cutOff z@(y:ys) | y `elem` "\t " = cutOff ys
-                        | otherwise      = z
-
-
-clearIndentTillEOF :: String -> Maybe String
-clearIndentTillEOF ""                       = Nothing
-clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
-                           | otherwise      = Nothing
-
-  where cutOff ""                      = Just ""
-        cutOff z@('\n':_)              = Just z
-        cutOff (y:ys) | y `elem` "\t " = cutOff ys
-                      | otherwise      = Nothing
-
-
-clearLastQXBLineBreak :: String -> Bool
--- Cannot be empty (matched in `parseQMB`)
-clearLastQXBLineBreak ""                        = False
-clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
-                             | otherwise        = False
-
-  where f ""                        = True
-        f (y:ys) | y `elem` "\t\n " = f ys
-                 | otherwise        = False

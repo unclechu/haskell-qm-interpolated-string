@@ -2,52 +2,30 @@
 -- Author of the 'interpolatedstring-perl6' package: Audrey Tang
 
 {-# LANGUAGE TemplateHaskell #-}
-
-{-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TypeSynonymInstances #-}
-{-# LANGUAGE UndecidableInstances #-}
-{-# LANGUAGE IncoherentInstances #-}
-{-# LANGUAGE FlexibleInstances #-}
-
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
 
-{-# LANGUAGE CPP #-}
-
 module Text.InterpolatedString.QM.Parsers (qm, qn, qmb, qnb) where
 
-import "base" GHC.Exts (IsString (fromString))
-
 import qualified "template-haskell" Language.Haskell.TH as TH
-import "haskell-src-meta" Language.Haskell.Meta.Parse (parseExp)
-
-#if MIN_VERSION_base(4,8,0)
-#else
-import "base" Data.Monoid (mempty, mappend)
-#endif
 
 -- local imports
-import Text.InterpolatedString.QM.ShowQ.Class (ShowQ (..))
-import Text.InterpolatedString.QM.TH ( StringPart (..)
-                                     , LineBreaks (..)
-                                     , parserTpl
 
-                                       -- Required for generated code
-                                     , Parser
-                                     , unQX
-                                     , clearIndentAtSOF
-                                     , clearIndentTillEOF
-                                     , clearLastQXBLineBreak
-                                     )
+import Text.InterpolatedString.QM.Parsers.TH (parserTpl)
 
-class QQ a string where
-  toQQ :: a -> string
+import Text.InterpolatedString.QM.Parsers.Types ( Parser
+                                                , StringPart (..)
+                                                , LineBreaks (..)
+                                                )
 
-instance IsString s => QQ s s where
-  toQQ = id
-
-instance (ShowQ a, IsString s) => QQ a s where
-  toQQ = fromString . showQ
+import Text.InterpolatedString.QM.Parsers.Helpers ( unQX
+                                                  , clearIndentAtStart
+                                                  , clearIndentAtSOF
+                                                  , clearIndentTillEOF
+                                                  , clearFirstQXBLineBreak
+                                                  , clearLastQXBLineBreak
+                                                  , makeExpr
+                                                  )
 
 
 $(parserTpl "parseQM"  True  IgnoreLineBreaks)
@@ -82,30 +60,3 @@ qnb = makeExpr
     . clearFirstQXBLineBreak
     . clearIndentAtStart
     . filter (/= '\r')
-
-
-clearFirstQXBLineBreak :: String -> String
-clearFirstQXBLineBreak ""                          = ""
-clearFirstQXBLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
-                                | otherwise        = s
-  where cutOff ""                          = ""
-        cutOff c@(y:ys) | y `elem` "\t\n " = cutOff ys
-                        | otherwise        = c
-
-
-clearIndentAtStart :: String -> String
-clearIndentAtStart ""                        = ""
-clearIndentAtStart s@(x:xs) | x `elem` "\t " = clearIndentAtStart xs
-                            | otherwise      = s
-
-
-makeExpr :: [StringPart] -> TH.ExpQ
-makeExpr [] = [| mempty |]
-makeExpr (Literal a : xs) =
-  TH.appE [| mappend (fromString a) |]    $ makeExpr xs
-makeExpr (AntiQuote a : xs) =
-  TH.appE [| mappend (toQQ $(reify a)) |] $ makeExpr xs
-  where reify :: String -> TH.Q TH.Exp
-        reify s = case parseExp s of
-                       Left  e -> TH.reportError e >> [| mempty |]
-                       Right e -> return e

@@ -27,8 +27,10 @@ library
   ghc-options:     -Wall
   hs-source-dirs:  src
   exposed-modules: Text.InterpolatedString.QM
-                 , Text.InterpolatedString.QM.TH
                  , Text.InterpolatedString.QM.Parsers
+                 , Text.InterpolatedString.QM.Parsers.TH
+                 , Text.InterpolatedString.QM.Parsers.Types
+                 , Text.InterpolatedString.QM.Parsers.Helpers
                  , Text.InterpolatedString.QM.ShowQ.Class
   build-depends:   base ==4.*
                  , template-haskell >=2.5 && <3
