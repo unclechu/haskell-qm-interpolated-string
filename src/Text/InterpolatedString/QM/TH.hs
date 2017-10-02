@@ -15,7 +15,16 @@ module Text.InterpolatedString.QM.TH
   ) where
 
 import qualified "template-haskell" Language.Haskell.TH as TH
-import "base" Data.Maybe (catMaybes)
+import "base" Control.Arrow ((&&&))
+
+
+data Decl
+  = Decl
+  { c :: Bool   -- (c)ondition
+  , p :: TH.Pat -- (p)attern
+  , e :: TH.Exp -- (e)xpression
+  }
+  deriving (Show, Eq)
 
 
 data StringPart = Literal String | AntiQuote String deriving Show
@@ -28,59 +37,74 @@ tplParseQM :: String
            -> Bool
            -- ^ Enable interpolation
            -> TH.DecsQ
-tplParseQM (TH.mkName -> n) withInterpolation = pure
+tplParseQM (TH.mkName -> n) withInterpolation = return
 
   [ TH.SigD n (TH.ConT $ TH.mkName "Parser")
-  , TH.FunD n (catMaybes d)
+  , TH.FunD n $ map (uncurry f . (p &&& e)) decls
   ]
 
-  where d = [ fu (lp [])
-                 (le [apps [ce "Literal", apps [ve "reverse", av]]])
+  where decls = filter c
+          [ d { p = lp []
+              , e = le [apps [ce "Literal", apps [ve "reverse", av]]]
+              }
 
-            , fu (consP [chrP '\\', chrP '\\', vp "xs"])
-                 (apps [fe, consE [chrE '\\', av], ve "xs"])
+          , d { p = consP [chrP '\\', chrP '\\', vp "xs"]
+              , e = apps [fe, consE [chrE '\\', av], ve "xs"]
+              }
 
-            , fi withInterpolation
-                 (consP [chrP '\\', chrP '{', vp "xs"])
-                 (apps [fe, consE [chrE '{', av], ve "xs"])
+          , d { c = withInterpolation
+              , p = consP [chrP '\\', chrP '{', vp "xs"]
+              , e = apps [fe, consE [chrE '{', av], ve "xs"]
+              }
 
-            , fu (consP [chrP '\\', chrP ' ', vp "xs"])
-                 (apps [fe, consE [chrE ' ', av], ve "xs"])
+          , d { p = consP [chrP '\\', chrP ' ', vp "xs"]
+              , e = apps [fe, consE [chrE ' ', av], ve "xs"]
+              }
 
-            , fu (consP [chrP '\\', chrP '\n', vp "xs"])
-                 (apps [fe, av, consE [chrE '\n', ve "xs"]])
+          , d { p = consP [chrP '\\', chrP '\n', vp "xs"]
+              , e = apps [fe, av, consE [chrE '\n', ve "xs"]]
+              }
 
-            , fu (consP [chrP '\\', chrP 'n', vp "xs"])
-                 (apps [fe, consE [chrE '\n', av], ve "xs"])
+          , d { p = consP [chrP '\\', chrP 'n', vp "xs"]
+              , e = apps [fe, consE [chrE '\n', av], ve "xs"]
+              }
 
-            , fu (consP [chrP '\\', chrP '\t', vp "xs"])
-                 (apps [fe, consE [chrE '\t', av], ve "xs"])
+          , d { p = consP [chrP '\\', chrP '\t', vp "xs"]
+              , e = apps [fe, consE [chrE '\t', av], ve "xs"]
+              }
 
-            , fu (consP [chrP '\\', chrP 't', vp "xs"])
-                 (apps [fe, consE [chrE '\t', av], ve "xs"])
+          , d { p = consP [chrP '\\', chrP 't', vp "xs"]
+              , e = apps [fe, consE [chrE '\t', av], ve "xs"]
+              }
 
-            , fu (strP "\\")
-                 (apps [fe, consE [chrE '\\', av], strE ""])
+          , d { p = strP "\\"
+              , e = apps [fe, consE [chrE '\\', av], strE ""]
+              }
 
-            , fi withInterpolation
-                 (consP [chrP '{', vp "xs"])
-                 (consE [ apps [ce "Literal", apps [ve "reverse", av]]
-                        , apps [ve "unQX", fe, strE "", ve "xs"]
-                        ])
+          , d { c = withInterpolation
+              , p = consP [chrP '{', vp "xs"]
+              , e = consE [ apps [ce "Literal", apps [ve "reverse", av]]
+                          , apps [ve "unQX", fe, strE "", ve "xs"]
+                          ]
+              }
 
-            , fu (TH.ViewP (ve "clearIndentAtSOF") $ cp "Just" [vp "clean"])
-                 (apps [fe, av, ve "clean"])
+          , d { p = TH.ViewP (ve "clearIndentAtSOF") $ cp "Just" [vp "clean"]
+              , e = apps [fe, av, ve "clean"]
+              }
 
-            , fu (TH.ViewP (ve "clearIndentTillEOF") $ cp "Just" [vp "clean"])
-                 (apps [fe, av, ve "clean"])
+          , d { p = TH.ViewP (ve "clearIndentTillEOF") $ cp "Just" [vp "clean"]
+              , e = apps [fe, av, ve "clean"]
+              }
 
-              -- Cut off line-breaks
-            , fu (consP [chrP '\n', vp "xs"])
-                 (apps [fe, av, ve "xs"])
+            -- Cutting off line-breaks
+          , d { p = consP [chrP '\n', vp "xs"]
+              , e = apps [fe, av, ve "xs"]
+              }
 
-            , fu (consP [vp "x", vp "xs"])
-                 (apps [fe, consE [ve "x", av], ve "xs"])
-            ]
+          , d { p = consP [vp "x", vp "xs"]
+              , e = apps [fe, consE [ve "x", av], ve "xs"]
+              }
+          ]
 
         fe = TH.VarE n
         a = TH.mkName "a" ; ap = TH.VarP a ; av = TH.VarE a
@@ -92,8 +116,7 @@ tplParseQM (TH.mkName -> n) withInterpolation = pure
         chrP = TH.LitP . TH.CharL   ; chrE = TH.LitE . TH.CharL
         strP = TH.LitP . TH.StringL ; strE = TH.LitE . TH.StringL
 
-        fu pat body = Just $ TH.Clause (ap : pat : []) (TH.NormalB body) []
-        fi cond pat body = if cond then fu pat body else Nothing
+        f pat body = TH.Clause (ap : pat : []) (TH.NormalB body) []
 
         apps [x] = x
         apps (x:y:zs) = apps $ TH.AppE x y : zs
@@ -111,10 +134,10 @@ tplParseQM (TH.mkName -> n) withInterpolation = pure
 -- Parser for interpolation block
 unQX :: Parser -> Parser
 unQX _ a ""          = [Literal (reverse a)]
-unQX p a ('\\':x:xs) = unQX p (x:a) xs
-unQX p a ("\\")      = unQX p ('\\':a) ""
-unQX p a ('}':xs)    = AntiQuote (reverse a) : p "" xs
-unQX p a (x:xs)      = unQX p (x:a) xs
+unQX f a ('\\':x:xs) = unQX f (x:a) xs
+unQX f a ("\\")      = unQX f ('\\':a) ""
+unQX f a ('}':xs)    = AntiQuote (reverse a) : f "" xs
+unQX f a (x:xs)      = unQX f (x:a) xs
 
 
 clearIndentAtSOF :: String -> Maybe String
@@ -126,8 +149,8 @@ clearIndentAtSOF s@(x:xs) | x == '\n' && hasChanges = Just processed
         hasChanges = processed /= s
 
         cutOff ""                        = ""
-        cutOff c@(y:ys) | y `elem` "\t " = cutOff ys
-                        | otherwise      = c
+        cutOff z@(y:ys) | y `elem` "\t " = cutOff ys
+                        | otherwise      = z
 
 
 clearIndentTillEOF :: String -> Maybe String
@@ -136,6 +159,11 @@ clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
                            | otherwise      = Nothing
 
   where cutOff ""                      = Just ""
-        cutOff c@('\n':_)              = Just c
+        cutOff z@('\n':_)              = Just z
         cutOff (y:ys) | y `elem` "\t " = cutOff ys
                       | otherwise      = Nothing
+
+
+-- Default value
+d :: Decl
+d = Decl { c = True, p = TH.WildP, e = TH.VarE $ TH.mkName "_" }
