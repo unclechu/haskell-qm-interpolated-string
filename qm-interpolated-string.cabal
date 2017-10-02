@@ -25,7 +25,6 @@ source-repository head
 
 library
   ghc-options:     -Wall
-                   -ddump-splices
   hs-source-dirs:  src
   exposed-modules: Text.InterpolatedString.QM
                  , Text.InterpolatedString.QM.TH
