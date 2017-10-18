@@ -27,8 +27,8 @@ import Text.InterpolatedString.QM.Internal.Parsers.Helpers
   , clearIndentAtStart
   , clearIndentAtSOF
   , clearIndentTillEOF
-  , clearFirstQXBLineBreak
-  , clearLastQXBLineBreak
+  , clearFirstQXXLineBreak
+  , clearLastQXXLineBreak
   , makeExpr
   )
 
@@ -55,7 +55,7 @@ qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
 qmb :: String -> TH.ExpQ
 qmb = makeExpr
     . parseQMB ""
-    . clearFirstQXBLineBreak
+    . clearFirstQXXLineBreak
     . clearIndentAtStart
     . filter (/= '\r')
 
@@ -64,7 +64,7 @@ qmb = makeExpr
 qnb :: String -> TH.ExpQ
 qnb = makeExpr
     . parseQNB ""
-    . clearFirstQXBLineBreak
+    . clearFirstQXXLineBreak
     . clearIndentAtStart
     . filter (/= '\r')
 
@@ -74,7 +74,7 @@ qnb = makeExpr
 qms :: String -> TH.ExpQ
 qms = makeExpr
     . parseQMS ""
-    . clearFirstQXBLineBreak
+    . clearFirstQXXLineBreak
     . clearIndentAtStart
     . filter (/= '\r')
 
@@ -84,6 +84,6 @@ qms = makeExpr
 qns :: String -> TH.ExpQ
 qns = makeExpr
     . parseQNS ""
-    . clearFirstQXBLineBreak
+    . clearFirstQXXLineBreak
     . clearIndentAtStart
     . filter (/= '\r')

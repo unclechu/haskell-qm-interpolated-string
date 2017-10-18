@@ -16,8 +16,8 @@ module Text.InterpolatedString.QM.Internal.Parsers.Helpers
   , clearIndentAtStart
   , clearIndentAtSOF
   , clearIndentTillEOF
-  , clearFirstQXBLineBreak
-  , clearLastQXBLineBreak
+  , clearFirstQXXLineBreak
+  , clearLastQXXLineBreak
   , makeExpr
   ) where
 
@@ -82,11 +82,10 @@ clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
                       | otherwise      = Nothing
 
 
--- TODO rename
-clearLastQXBLineBreak :: String -> Bool
+clearLastQXXLineBreak :: String -> Bool
 -- Cannot really be empty (matched in `parseQMB`)
-clearLastQXBLineBreak ""                        = False
-clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
+clearLastQXXLineBreak ""                        = False
+clearLastQXXLineBreak (x:xs) | x `elem` "\t\n " = f xs
                              | otherwise        = False
 
   where f ""                        = True
@@ -94,10 +93,9 @@ clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
                  | otherwise        = False
 
 
--- TODO rename
-clearFirstQXBLineBreak :: String -> String
-clearFirstQXBLineBreak ""                          = ""
-clearFirstQXBLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
+clearFirstQXXLineBreak :: String -> String
+clearFirstQXXLineBreak ""                          = ""
+clearFirstQXXLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
                                 | otherwise        = s
   where cutOff ""                          = ""
         cutOff c@(y:ys) | y `elem` "\t\n " = cutOff ys

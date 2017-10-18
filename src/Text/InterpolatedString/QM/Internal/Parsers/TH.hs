@@ -65,7 +65,7 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           )
 
       , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
-          , ViewP (varE "clearLastQXBLineBreak") $ conP "True" []
+          , ViewP (varE "clearLastQXXLineBreak") $ conP "True" []
           , apps [fE, aE, strE ""]
           )
 
@@ -90,10 +90,16 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
         -- Explicitly slicing line-breaks
       , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
           , consP [chrP '\\', chrP '\n', varP "xs"]
-          , apps [apps [fE, aE, apps [ varE "maybe", varE "xs", varE "tail"
-                                     , apps [ varE "clearIndentAtSOF"
-                                            , consE [chrE '\n', varE "xs"]
-                                            ]]]]
+
+          , let sliceFakeLnOrUseXS maybeVal =
+                  apps [varE "maybe", varE "xs", varE "tail", maybeVal]
+
+                clearNextLineIndentFromXS =
+                  -- Fake '\n' here to make `clearIndentAtSOF` works for this
+                  apps [varE "clearIndentAtSOF", consE [chrE '\n', varE "xs"]]
+
+             in -- Recursively do stuff
+                apps [fE, aE, sliceFakeLnOrUseXS clearNextLineIndentFromXS]
           )
 
       , D ( consP [chrP '\\', chrP 'n', varP "xs"]
