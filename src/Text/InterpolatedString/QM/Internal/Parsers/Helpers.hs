@@ -82,8 +82,9 @@ clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
                       | otherwise      = Nothing
 
 
+-- TODO rename
 clearLastQXBLineBreak :: String -> Bool
--- Cannot be empty (matched in `parseQMB`)
+-- Cannot really be empty (matched in `parseQMB`)
 clearLastQXBLineBreak ""                        = False
 clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
                              | otherwise        = False
@@ -93,6 +94,7 @@ clearLastQXBLineBreak (x:xs) | x `elem` "\t\n " = f xs
                  | otherwise        = False
 
 
+-- TODO rename
 clearFirstQXBLineBreak :: String -> String
 clearFirstQXBLineBreak ""                          = ""
 clearFirstQXBLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs

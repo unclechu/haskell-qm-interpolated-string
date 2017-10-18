@@ -13,7 +13,7 @@ type Parser = String -> String -> [StringPart]
 data LineBreaks
   = IgnoreLineBreaks
   | KeepLineBreaks
-  | ReplaceLineBreaksWithSpaces -- TODO implement
+  | ReplaceLineBreaksWithSpaces
   deriving (Show, Eq)
 
 data StringPart = Literal String | AntiQuote String deriving Show

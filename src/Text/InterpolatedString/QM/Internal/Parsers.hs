@@ -5,7 +5,11 @@
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
 
-module Text.InterpolatedString.QM.Internal.Parsers (qm, qn, qmb, qnb) where
+module Text.InterpolatedString.QM.Internal.Parsers
+  ( qm,  qn
+  , qmb, qnb
+  , qms, qns
+  ) where
 
 import qualified "template-haskell" Language.Haskell.TH as TH
 
@@ -33,6 +37,8 @@ $(parserTpl "parseQM"  True  IgnoreLineBreaks)
 $(parserTpl "parseQN"  False IgnoreLineBreaks)
 $(parserTpl "parseQMB" True  KeepLineBreaks)
 $(parserTpl "parseQNB" False KeepLineBreaks)
+$(parserTpl "parseQMS" True  ReplaceLineBreaksWithSpaces)
+$(parserTpl "parseQNS" False ReplaceLineBreaksWithSpaces)
 
 
 -- With interpolation blocks (line-breaks and indentation are ignored)
@@ -58,6 +64,26 @@ qmb = makeExpr
 qnb :: String -> TH.ExpQ
 qnb = makeExpr
     . parseQNB ""
+    . clearFirstQXBLineBreak
+    . clearIndentAtStart
+    . filter (/= '\r')
+
+
+-- With interpolation blocks
+-- (line-breaks are replaced with spaces, indentation is ignored).
+qms :: String -> TH.ExpQ
+qms = makeExpr
+    . parseQMS ""
+    . clearFirstQXBLineBreak
+    . clearIndentAtStart
+    . filter (/= '\r')
+
+
+-- No interpolation block
+-- (line-breaks are replaced with spaces, indentation is ignored).
+qns :: String -> TH.ExpQ
+qns = makeExpr
+    . parseQNS ""
     . clearFirstQXBLineBreak
     . clearIndentAtStart
     . filter (/= '\r')

@@ -10,6 +10,12 @@
 * Added `qnb` QuasiQuoter (`qmb` without interpolation),
   it's `qn` + `b` (line-<b>B</b>reaks),
   it works just as `qn` but keeps line-breaks (still ignores indendation)
+* Added `qms` QuasiQuoter,
+  it's `qm` + `s` (<b>S</b>paces),
+  it works just as `qmb` but kept line-breaks replaced with spaces
+* Added `qns` QuasiQuoter (`qms` without interpolation),
+  it's `qn` + `s` (<b>S</b>paces),
+  it works just as `qnb` but kept line-breaks replaced with spaces
 
 ## <a name="v0.1.1.0"></a>0.1.1.0
 

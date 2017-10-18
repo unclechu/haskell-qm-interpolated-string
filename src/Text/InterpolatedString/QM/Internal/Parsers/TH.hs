@@ -32,10 +32,26 @@ parserTpl :: String
           -> TH.DecsQ
 parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
 
-  [ TH.SigD n (TH.ConT $ TH.mkName "Parser")
-  , TH.FunD n decls
+  [ TH.SigD n (TH.ConT $ TH.mkName "Parser") -- Type annotation for parser
+  , TH.FunD n decls                          -- All patterns to match
   ]
 
+  -- About naming variables:
+  --   Suffixes (where `foo` is a variable name):
+  --     * `fooP` means Pattern
+  --     * `fooE` means Expression
+  -- Variables:
+  --   * `fE` - Quoter-parser's name (like `parseQM`), for recursive calls
+  --   * `aE` - Result accumulator, defined for each pattern, like:
+  --              `parseQM a …` where `…` is pattern and body
+  --            For each from `decls` this prefix shown above
+  --              is aproduced by `f` helper.
+  --            For instance first pattern would be:
+  --              `parseQM a [] = [Literal (reverse a)]`
+  --   * `f` - Helper to prefix each pattern with `parseQM a`
+  --           where `parseQM` is a name of parser from first argument.
+  --  `apps` produces Expression,
+  --    multiple function application with variate arity.
   where
 
     decls =
@@ -48,7 +64,7 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           , ListE [apps [conE "Literal", apps [varE "reverse", aE]]]
           )
 
-      , C ( lineBreaks == KeepLineBreaks
+      , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
           , ViewP (varE "clearLastQXBLineBreak") $ conP "True" []
           , apps [fE, aE, strE ""]
           )
@@ -72,7 +88,7 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           )
 
         -- Explicitly slicing line-breaks
-      , C ( lineBreaks == KeepLineBreaks
+      , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
           , consP [chrP '\\', chrP '\n', varP "xs"]
           , apps [apps [fE, aE, apps [ varE "maybe", varE "xs", varE "tail"
                                      , apps [ varE "clearIndentAtSOF"
@@ -117,13 +133,19 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           , apps [fE, aE, varE "xs"]
           )
 
+        -- Replacing line-breaks with spaces
+      , C ( lineBreaks == ReplaceLineBreaksWithSpaces
+          , consP [chrP '\n', varP "xs"]
+          , apps [fE, consE [chrE ' ', aE], varE "xs"]
+          )
+
       , D ( consP [varP "x", varP "xs"]
           , apps [fE, consE [varE "x", aE], varE "xs"]
           )
       ]
 
     aE = varE "a"
-    f pat body = TH.Clause (varP "a" : pat : []) (TH.NormalB body) []
+    f pat body = TH.Clause [varP "a", pat] (TH.NormalB body) []
 
     apps [x] = x
     apps (x:y:zs) = apps $ TH.AppE x y : zs

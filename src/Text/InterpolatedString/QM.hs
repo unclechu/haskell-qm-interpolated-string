@@ -3,7 +3,7 @@
 
 {-# LANGUAGE PackageImports #-}
 
-module Text.InterpolatedString.QM (qm, qn, qmb, qnb, ShowQ (..)) where
+module Text.InterpolatedString.QM (qm, qn, qmb, qnb, qms, qns, ShowQ (..)) where
 
 import "template-haskell" Language.Haskell.TH.Quote (QuasiQuoter (QuasiQuoter))
 
@@ -74,3 +74,19 @@ qnb = QuasiQuoter Parsers.qnb
   (error "Cannot use 'qnb' as a pattern")
   (error "Cannot use 'qnb' as a type")
   (error "Cannot use 'qnb' as a dec")
+
+
+-- TODO add description
+qms :: QuasiQuoter
+qms = QuasiQuoter Parsers.qms
+  (error "Cannot use 'qms' as a pattern")
+  (error "Cannot use 'qms' as a type")
+  (error "Cannot use 'qms' as a dec")
+
+
+-- TODO add description
+qns :: QuasiQuoter
+qns = QuasiQuoter Parsers.qns
+  (error "Cannot use 'qns' as a pattern")
+  (error "Cannot use 'qns' as a type")
+  (error "Cannot use 'qns' as a dec")
