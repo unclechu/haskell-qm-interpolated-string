@@ -19,8 +19,15 @@ import Text.InterpolatedString.QM.Internal.Parsers.Types (LineBreaks (..))
 
 
 data Decl
-  = C (Bool, TH.Pat, TH.Exp)
-  | D (TH.Pat, TH.Exp)
+
+  =  C (Bool, TH.Pat, TH.Exp)
+  -- ^ 'C' means 'Conditional'.
+  --   First value of tuple is condition to add pattern or not.
+
+  |  D (TH.Pat, TH.Exp)
+  -- ^ 'D' means 'Declarative'.
+  --   A pattern always will be added.
+
   deriving (Show, Eq)
 
 
