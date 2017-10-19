@@ -9,17 +9,20 @@ that ignores indentation and trailing whitespaces.
 
 Actually it's modification of
 [interpolatedstring-perl6](https://github.com/audreyt/interpolatedstring-perl6)
-package. I used it to implemenent my own strings I really like.
+package. I've forked it to implemenent my own strings I really like.
 
-This implementation looks just like `qc`
-from **interpolatedstring-perl6** package but ignores any indentation,
-line breaks (except explicitly written using `\n` char)
+This implementation based on `qc` from **interpolatedstring-perl6** package
+but ignores any indentation, line breaks
+(except explicitly written using `\n` char)
 and trailing whitespaces.
 
-'m' in 'qm' means 'multiline'.
+* 'm' in `qm` means '<b>M</b>ultiline'.
+* 'n' in `qn` means '<b>N</b>o interpolation'.
+* 'b' in `qmb`/`qnb` means 'line <b>B</b>reaks'.
+* 's' in `qms`/`qns` means '<b>S</b>paces'.
 
-You could write a decoratively formatted string and your
-decorative indentation and line breaks wont go to the string,
+Write a decoratively formatted string and your
+decorative indentation and line breaks wont go to result string,
 but when you really need it, you could just escape it using backslash.
 
 ## Usage example
@@ -101,7 +104,7 @@ main = do
 
 ### All QuasiQuoters
 
-| QuasiQuoter | Interpolation | Indentation | Line-breaks          | Trailing whitespaces |
+| QuasiQuoter | Interpolation | Indentation | Line breaks          | Trailing whitespaces |
 |-------------|---------------|-------------|----------------------|----------------------|
 | `qm`        | ✓             | Removed     | Removed              | Removed              |
 | `qn`        | ✗             | Removed     | Removed              | Removed              |
@@ -116,8 +119,8 @@ main = do
 |----------------------|----------------------------------|--------------------|
 | `m`                  | Resolves interpolation blocks    | `qm`, `qmb`, `qms` |
 | `n`                  | Without interpolation            | `qn`, `qnb`, `qns` |
-| `b`                  | Keeps line-breaks                | `qmb`, `qnb`       |
-| `s`                  | Replaces line-breaks with spaces | `qms`, `qns`       |
+| `b`                  | Keeps line breaks                | `qmb`, `qnb`       |
+| `s`                  | Replaces line breaks with spaces | `qms`, `qns`       |
 
 ## More examples
 
@@ -129,20 +132,19 @@ main = do
 
 ```haskell
 [qm|
-        indentation and line
-      -
-  bre
-  aks are i
-      gno
-    red
+        indentation and li
+  ne bre
+   aks are i
+       gno
+     red
 |]
--- Result: "indentation and line-breaks are ignored"
+-- Result: "indentation and line breaks are ignored"
 ```
 
 ```haskell
 [qm|  \  You can escape indentation or\n
-         line-breaks when you need them! \  |]
--- Result: "  You can escape indentation or\nline-breaks when you need them!  "
+         line breaks when you need them! \  |]
+-- Result: "  You can escape indentation or\nline breaks when you need them!  "
 ```
 
 ```haskell

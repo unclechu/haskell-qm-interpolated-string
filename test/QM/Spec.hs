@@ -117,20 +117,21 @@ spec = do
         `shouldBe`
           "you can escape spaces when you need them"
 
-    it "Indentation and line-breaks are ignored" $ [qm|
-            indentation and line
-          -
-      bre
-      aks are i
-          gno
-        red
-    |] `shouldBe` "indentation and line-breaks are ignored"
+    it "Indentation and line-breaks are ignored" $ 
+      [qm|
+              indentation and li
+        ne bre
+         aks are i
+             gno
+           red
+      |]
+      `shouldBe` "indentation and line breaks are ignored"
 
     it "Escaping indentation or line-breaks" $
       [qm|  \  You can escape indentation or\n
-               line-breaks when you need them! \  |]
+               line breaks when you need them! \  |]
         `shouldBe`
-          "  You can escape indentation or\nline-breaks when you need them!  "
+          "  You can escape indentation or\nline breaks when you need them!  "
 
     it "Interpolation blocks can be escaped too" $
       [qm| Interpolation blocks can be escaped too: {1+2} \{3+4} |]
