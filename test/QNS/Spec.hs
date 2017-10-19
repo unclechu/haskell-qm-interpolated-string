@@ -135,3 +135,8 @@ spec = do
           "<article> <h1>{title}</h1> <p>{text}</p> </article>"
 
     it "Interpolation" $ [qns| foo {1+2} |] `shouldBe` "foo {1+2}"
+
+  it "Haddock example" $
+    [qns| foo
+          {'b':'a':'r':""}
+          baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"

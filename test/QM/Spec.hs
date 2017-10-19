@@ -139,3 +139,7 @@ spec = do
           "Interpolation blocks can be escaped too: 3 {3+4}"
 
     it "Interpolation" $ [qm| foo {1+2} |] `shouldBe` "foo 3"
+
+  it "Haddock example" $
+    [qm| foo {'b':'a':'r':""}
+       \ baz |] `shouldBe` "foo bar baz"

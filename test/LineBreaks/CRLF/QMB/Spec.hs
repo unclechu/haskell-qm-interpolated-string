@@ -134,3 +134,8 @@ spec = do
           "<article>\n<h1>Testing</h1>\n<p>Some testing text</p>\n</article>"
 
     it "Interpolation" $ [qmb| foo {1+2} |] `shouldBe` "foo 3"
+
+  it "Haddock example" $
+    [qmb| foo
+          {'b':'a':'r':""}
+          baz |] `shouldBe` "foo\nbar\nbaz"
