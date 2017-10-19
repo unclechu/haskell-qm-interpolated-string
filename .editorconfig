@@ -11,3 +11,12 @@ indent_size = 2
 
 [test/**.hs]
 trim_trailing_whitespace = false
+
+[test/LineBreaks/CR/**.hs]
+end_of_line = cr
+
+[test/LineBreaks/CRLF/**.hs]
+end_of_line = crlf
+
+[*.sh]
+indent_style = tab
