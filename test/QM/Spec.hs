@@ -96,3 +96,45 @@ spec = do
             foo			
             				
             				|] `shouldBe` "foo"
+
+  describe "New README examples" $ do
+
+    it "Simple usage example" $ do
+      let title = "Testing"
+          text = "Some testing text"
+      [qm|
+        <article>
+          <h1>{title}</h1>
+          <p>{text}</p>
+        </article>
+      |]
+        `shouldBe`
+          "<article><h1>Testing</h1><p>Some testing text</p></article>"
+
+    it "Can escape spaces" $
+      [qm|   you can escape spaces
+           \ when you need them    |]
+        `shouldBe`
+          "you can escape spaces when you need them"
+
+    it "Indentation and line-breaks are ignored" $ [qm|
+            indentation and line
+          -
+      bre
+      aks are i
+          gno
+        red
+    |] `shouldBe` "indentation and line-breaks are ignored"
+
+    it "Escaping indentation or line-breaks" $
+      [qm|  \  You can escape indentation or\n
+               line-breaks when you need them! \  |]
+        `shouldBe`
+          "  You can escape indentation or\nline-breaks when you need them!  "
+
+    it "Interpolation blocks can be escaped too" $
+      [qm| Interpolation blocks can be escaped too: {1+2} \{3+4} |]
+        `shouldBe`
+          "Interpolation blocks can be escaped too: 3 {3+4}"
+
+    it "Interpolation" $ [qm| foo {1+2} |] `shouldBe` "foo 3"

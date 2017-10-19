@@ -117,3 +117,25 @@ spec = do
             foo			
             				
             				|] `shouldBe` "foo"
+
+  describe "New README examples" $ do
+
+    it "First example" $
+      [qms| Hello,
+            world!
+            Pi is {floor pi}.{floor $ (pi - 3) * 100}… |]
+        `shouldBe` "Hello, world! Pi is 3.14…"
+
+    it "Simple usage example" $ do
+      let title = "Testing"
+          text = "Some testing text"
+      [qms|
+        <article>
+          <h1>{title}</h1>
+          <p>{text}</p>
+        </article>
+      |]
+        `shouldBe`
+          "<article> <h1>Testing</h1> <p>Some testing text</p> </article>"
+
+    it "Interpolation" $ [qms| foo {1+2} |] `shouldBe` "foo 3"

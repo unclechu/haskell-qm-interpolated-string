@@ -122,3 +122,17 @@ spec = do
             foo			
             				
             				|] `shouldBe` "foo"
+
+  describe "New README examples" $ do
+
+    it "Simple usage example" $ do
+      [qnb|
+        <article>
+          <h1>{title}</h1>
+          <p>{text}</p>
+        </article>
+      |]
+        `shouldBe`
+          "<article>\n<h1>{title}</h1>\n<p>{text}</p>\n</article>"
+
+    it "Interpolation" $ [qnb| foo {1+2} |] `shouldBe` "foo {1+2}"

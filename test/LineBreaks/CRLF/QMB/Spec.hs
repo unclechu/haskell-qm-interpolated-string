@@ -118,3 +118,19 @@ spec = do
             foo			
             				
             				|] `shouldBe` "foo"
+
+  describe "New README examples" $ do
+
+    it "Simple usage example" $ do
+      let title = "Testing"
+          text = "Some testing text"
+      [qmb|
+        <article>
+          <h1>{title}</h1>
+          <p>{text}</p>
+        </article>
+      |]
+        `shouldBe`
+          "<article>\n<h1>Testing</h1>\n<p>Some testing text</p>\n</article>"
+
+    it "Interpolation" $ [qmb| foo {1+2} |] `shouldBe` "foo 3"

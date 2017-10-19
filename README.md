@@ -22,16 +22,79 @@ You could write a decoratively formatted string and your
 decorative indentation and line breaks wont go to the string,
 but when you really need it, you could just escape it using backslash.
 
-## Simple usage example
+## Usage example
 
 ```haskell
 {-# LANGUAGE QuasiQuotes #-}
 
-import Text.InterpolatedString.QM (qm)
+import Text.InterpolatedString.QM
 
 main :: IO ()
-main = putStrLn [qm| hello
-                   \ world |]
+main = do
+  -- Hello, world! Pi is 3.14…
+  putStrLn [qms| Hello,
+                 world!
+                 Pi is {floor pi}.{floor $ (pi - 3) * 100}… |]
+
+  -- Some examples with HTML below to demonstrate the difference
+  -- between all of the quasi-quoters.
+
+  let title = "Testing"
+      text = "Some testing text"
+
+  -- <article><h1>Testing</h1><p>Some testing text</p></article>
+  putStrLn [qm|
+    <article>
+      <h1>{title}</h1>
+      <p>{text}</p>
+    </article>
+  |]
+
+  -- <article><h1>{title}</h1><p>{text}</p></article>
+  putStrLn [qn|
+    <article>
+      <h1>{title}</h1>
+      <p>{text}</p>
+    </article>
+  |]
+
+  -- <article> <h1>Testing</h1> <p>Some testing text</p> </article>
+  putStrLn [qms|
+    <article>
+      <h1>{title}</h1>
+      <p>{text}</p>
+    </article>
+  |]
+
+  -- <article> <h1>{title}</h1> <p>{text}</p> </article>
+  putStrLn [qns|
+    <article>
+      <h1>{title}</h1>
+      <p>{text}</p>
+    </article>
+  |]
+
+  -- <article>
+  -- <h1>Testing</h1>
+  -- <p>Some testing text</p>
+  -- </article>
+  putStrLn [qmb|
+    <article>
+      <h1>{title}</h1>
+      <p>{text}</p>
+    </article>
+  |]
+
+  -- <article>
+  -- <h1>{title}</h1>
+  -- <p>{text}</p>
+  -- </article>
+  putStrLn [qnb|
+    <article>
+      <h1>{title}</h1>
+      <p>{text}</p>
+    </article>
+  |]
 ```
 
 ## Tables
@@ -59,37 +122,45 @@ main = putStrLn [qm| hello
 ## More examples
 
 ```haskell
-[qm|   hello world,
-     \ what's going on here?  |]
--- Result: "hello world, what's going on here?"
+[qm|   you can escape spaces
+     \ when you need them    |]
+-- Result: "you can escape spaces when you need them"
 ```
 
 ```haskell
 [qm|
-      it's actual
-      ly ignored
-   |]
--- Result: "it's actually ignored"
+        indentation and line
+      -
+  bre
+  aks are i
+      gno
+    red
+|]
+-- Result: "indentation and line-breaks are ignored"
 ```
 
 ```haskell
-[qm|  \  You could explicitly escape indentation or\n
-         line-breaks when you really need it!  \
-   |]
--- Result: "  You could explicitly escape indentation or\nline-breaks when you really need it!  "
+[qm|  \  You can escape indentation or\n
+         line-breaks when you need them! \  |]
+-- Result: "  You can escape indentation or\nline-breaks when you need them!  "
 ```
 
 ```haskell
-[qm| {1+2} \{3+4} |]
--- Result: "3 {3+4}"
+[qm| Interpolation blocks can be escaped too: {1+2} \{3+4} |]
+-- Result: "Interpolation blocks can be escaped too: 3 {3+4}"
 ```
 
-There is also very similar to `qm` QuasiQuoter
-named as `qn` that do the same except interpolation:
+If you don't need interpolation - just replace `m` to `n` in quasi-quoter name:
 
 ```haskell
-[qn| foo {1+2} |]
--- Result: "foo {1+2}"
+[qm| foo {1+2} |] -- Result: "foo 3"
+[qn| foo {1+2} |] -- Result: "foo {1+2}"
+
+[qms| foo {1+2} |] -- Result: "foo 3"
+[qns| foo {1+2} |] -- Result: "foo {1+2}"
+
+[qmb| foo {1+2} |] -- Result: "foo 3"
+[qnb| foo {1+2} |] -- Result: "foo {1+2}"
 ```
 
 ## Author
