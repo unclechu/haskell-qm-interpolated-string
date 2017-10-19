@@ -21,7 +21,7 @@ handle-break() {
 ls -A test/Q{M,N}{,B,S}/Spec.hs | while read item; do
 	x=${item#*/}; x=${x%/*}
 
-	# It seems this line-breaks format is not allowed in haskell sources anyway.
+	# It seems this line breaks format is not allowed in haskell sources anyway.
 	# GHC fails with errors like this:
 	#   test/LineBreaks/CR/QM/Spec.hs:1:93: error: Not in scope: `spec'
 	# handle-break "$item" "CR"   "$x"

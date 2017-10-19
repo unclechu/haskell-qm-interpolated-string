@@ -6,16 +6,16 @@
   (updated upper version of **haskell-src-meta** from 0.7.x to 0.8.x)
 * Added `qmb` QuasiQuoter,
   it's `qm` + `b` (line-<b>B</b>reaks),
-  it works just as `qm` but keeps line-breaks (still ignores indendation)
+  it works just as `qm` but keeps line breaks (still ignores indendation)
 * Added `qnb` QuasiQuoter (`qmb` without interpolation),
   it's `qn` + `b` (line-<b>B</b>reaks),
-  it works just as `qn` but keeps line-breaks (still ignores indendation)
+  it works just as `qn` but keeps line breaks (still ignores indendation)
 * Added `qms` QuasiQuoter,
   it's `qm` + `s` (<b>S</b>paces),
-  it works just as `qmb` but kept line-breaks replaced with spaces
+  it works just as `qmb` but kept line breaks replaced with spaces
 * Added `qns` QuasiQuoter (`qms` without interpolation),
   it's `qn` + `s` (<b>S</b>paces),
-  it works just as `qnb` but kept line-breaks replaced with spaces
+  it works just as `qnb` but kept line breaks replaced with spaces
 
 ## <a name="v0.1.1.0"></a>0.1.1.0
 

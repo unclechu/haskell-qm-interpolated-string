@@ -20,7 +20,7 @@ spec = do
       bar
     |] `shouldBe` "foo {1+2} bar"
 
-  it "Explicitly slicing line-breaks" $ do
+  it "Explicitly slicing line breaks" $ do
     [qns|
       foo\
       {1+2}\
@@ -48,11 +48,11 @@ spec = do
          |]
             `shouldBe` "it's actual ly NOT ignored"
 
-    it "Third (explicit line-breaks symbols, line-break plus space)" $
+    it "Third (explicit line breaks symbols, line break plus space)" $
       [qns|  \  You could explicitly escape indentation or\n
-                line-breaks when you really need it!  \
+                line breaks when you really need it!  \
           |] `shouldBe` "  You could explicitly escape indentation or\n \
-                        \line-breaks when you really need it!  "
+                        \line breaks when you really need it!  "
 
     it "Fourth (escaping interpolation blocks to show them as text)" $
       [qns| {1+2} \{3+4} |] `shouldBe` "{1+2} \\{3+4}"
@@ -78,7 +78,7 @@ spec = do
 
   it "Empty string" $ [qns|  |] `shouldBe` ""
 
-  it "Escaping space by slash at EOL after space (line-break is sliced)" $
+  it "Escaping space by slash at EOL after space (line break is sliced)" $
     [qns| foo \
           bar |] `shouldBe` "foo bar"
 

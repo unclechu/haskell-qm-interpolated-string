@@ -41,17 +41,17 @@ $(parserTpl "parseQMS" True  ReplaceLineBreaksWithSpaces)
 $(parserTpl "parseQNS" False ReplaceLineBreaksWithSpaces)
 
 
--- With interpolation blocks (line-breaks and indentation are ignored)
+-- With interpolation blocks (line breaks and indentation are ignored)
 qm :: String -> TH.ExpQ
 qm = makeExpr . parseQM "" . clearIndentAtStart . filter (/= '\r')
 
 
--- No interpolation block (line-breaks and indentation are ignored)
+-- No interpolation block (line breaks and indentation are ignored)
 qn :: String -> TH.ExpQ
 qn = makeExpr . parseQN "" . clearIndentAtStart . filter (/= '\r')
 
 
--- With interpolation blocks (line-breaks are kept, indentation is ignored)
+-- With interpolation blocks (line breaks are kept, indentation is ignored)
 qmb :: String -> TH.ExpQ
 qmb = makeExpr
     . parseQMB ""
@@ -60,7 +60,7 @@ qmb = makeExpr
     . filter (/= '\r')
 
 
--- No interpolation block (line-breaks are kept, indentation is ignored)
+-- No interpolation block (line breaks are kept, indentation is ignored)
 qnb :: String -> TH.ExpQ
 qnb = makeExpr
     . parseQNB ""
@@ -70,7 +70,7 @@ qnb = makeExpr
 
 
 -- With interpolation blocks
--- (line-breaks are replaced with spaces, indentation is ignored).
+-- (line breaks are replaced with spaces, indentation is ignored).
 qms :: String -> TH.ExpQ
 qms = makeExpr
     . parseQMS ""
@@ -80,7 +80,7 @@ qms = makeExpr
 
 
 -- No interpolation block
--- (line-breaks are replaced with spaces, indentation is ignored).
+-- (line breaks are replaced with spaces, indentation is ignored).
 qns :: String -> TH.ExpQ
 qns = makeExpr
     . parseQNS ""

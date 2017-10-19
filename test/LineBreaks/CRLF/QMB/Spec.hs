@@ -20,7 +20,7 @@ spec = do
       bar
     |] `shouldBe` "foo\n3\nbar"
 
-  it "Explicitly slicing line-breaks" $ do
+  it "Explicitly slicing line breaks" $ do
     [qmb|
       foo\
       {1+2}\
@@ -48,11 +48,11 @@ spec = do
          |]
             `shouldBe` "it's actual\nly NOT ignored"
 
-    it "Third (explicit line-breaks symbols)" $
+    it "Third (explicit line breaks symbols)" $
       [qmb|  \  You could explicitly escape indentation or\n
-                line-breaks when you really need it!  \
+                line breaks when you really need it!  \
           |] `shouldBe` "  You could explicitly escape indentation or\n\n\
-                        \line-breaks when you really need it!  "
+                        \line breaks when you really need it!  "
 
     it "Fourth (escaping interpolation blocks to show them as text)" $
       [qmb| {1+2} \{3+4} |] `shouldBe` "3 {3+4}"
@@ -74,7 +74,7 @@ spec = do
 
   it "Empty string" $ [qmb|  |] `shouldBe` ""
 
-  it "Escaping space by slash at EOL after space (line-break is sliced)" $
+  it "Escaping space by slash at EOL after space (line break is sliced)" $
     [qmb| foo \
           bar |] `shouldBe` "foo bar"
 

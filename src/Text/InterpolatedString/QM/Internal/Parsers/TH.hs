@@ -94,7 +94,7 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           , apps [fE, aE, consE [chrE '\n', varE "xs"]]
           )
 
-        -- Explicitly slicing line-breaks
+        -- Explicitly slicing line breaks
       , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
           , consP [chrP '\\', chrP '\n', varP "xs"]
 
@@ -140,13 +140,13 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           , apps [fE, aE, varE "clean"]
           )
 
-        -- Cutting off line-breaks
+        -- Cutting off line breaks
       , C ( lineBreaks == IgnoreLineBreaks
           , consP [chrP '\n', varP "xs"]
           , apps [fE, aE, varE "xs"]
           )
 
-        -- Replacing line-breaks with spaces
+        -- Replacing line breaks with spaces
       , C ( lineBreaks == ReplaceLineBreaksWithSpaces
           , consP [chrP '\n', varP "xs"]
           , apps [fE, consE [chrE ' ', aE], varE "xs"]

@@ -27,11 +27,11 @@ spec = do
          |]
             `shouldBe` "it's actually ignored"
 
-    it "Third (explicit line-breaks symbols)" $
+    it "Third (explicit line breaks symbols)" $
       [qm|  \  You could explicitly escape indentation or\n
-               line-breaks when you really need it!  \
+               line breaks when you really need it!  \
          |] `shouldBe` "  You could explicitly escape indentation or\n\
-                       \line-breaks when you really need it!  "
+                       \line breaks when you really need it!  "
 
     it "Fourth (escaping interpolation blocks to show them as text)" $
       [qm| {1+2} \{3+4} |] `shouldBe` "3 {3+4}"
@@ -118,7 +118,7 @@ spec = do
         `shouldBe`
           "you can escape spaces when you need them"
 
-    it "Indentation and line-breaks are ignored" $ 
+    it "Indentation and line breaks are ignored" $ 
       [qm|
               indentation and li
         ne bre
@@ -128,7 +128,7 @@ spec = do
       |]
       `shouldBe` "indentation and line breaks are ignored"
 
-    it "Escaping indentation or line-breaks" $
+    it "Escaping indentation or line breaks" $
       [qm|  \  You can escape indentation or\n
                line breaks when you need them! \  |]
         `shouldBe`

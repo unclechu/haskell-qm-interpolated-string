@@ -26,11 +26,11 @@ spec = do
          |]
             `shouldBe` "it's actually ignored"
 
-    it "Third (explicit line-breaks symbols)" $
+    it "Third (explicit line breaks symbols)" $
       [qn|  \  You could explicitly escape indentation or\n
-               line-breaks when you really need it!  \
+               line breaks when you really need it!  \
          |] `shouldBe` "  You could explicitly escape indentation or\n\
-                       \line-breaks when you really need it!  "
+                       \line breaks when you really need it!  "
 
     it "Fourth (escaping interpolation blocks to show them as text)" $
       [qn| {1+2} \{3+4} |] `shouldBe` "{1+2} \\{3+4}"
