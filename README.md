@@ -149,14 +149,14 @@ Backslash is used for escaping these:
 ### Escaping examples
 
 ```haskell
-[qm| foo\nbar   |] -- "foo\nbar"
-[qm| foo\\nbar  |] -- "foo\\nbar"
-[qm| foo\tbar   |] -- "foo\tbar"
-[qm| foo\\tbar  |] -- "foo\\tbar"
-[qm| foo\	bar   |] -- "foo\tbar"
-[qm| foo\\	bar |] -- "foo\\\tbar"
-[qm| foo\ bar   |] -- "foo bar"
-[qm| foo\\ bar  |] -- "foo\\ bar"
+[qm| foo\nbar  |] -- "foo\nbar"
+[qm| foo\\nbar |] -- "foo\\nbar"
+[qm| foo\tbar  |] -- "foo\tbar"
+[qm| foo\\tbar |] -- "foo\\tbar"
+[qm| foo\‣bar  |] -- "foo\tbar"   (`‣` is real tab symbol)
+[qm| foo\\‣bar |] -- "foo\\\tbar" (`‣` is real tab symbol)
+[qm| foo\ bar  |] -- "foo bar"
+[qm| foo\\ bar |] -- "foo\\ bar"
 
 [qm| foo\
      bar  |] -- "foobar"
