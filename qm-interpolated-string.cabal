@@ -54,6 +54,12 @@ test-suite tests
                 , QNB.Spec
                 , QMS.Spec
                 , QNS.Spec
+                , LineBreaks.CRLF.QM.Spec
+                , LineBreaks.CRLF.QN.Spec
+                , LineBreaks.CRLF.QMB.Spec
+                , LineBreaks.CRLF.QNB.Spec
+                , LineBreaks.CRLF.QMS.Spec
+                , LineBreaks.CRLF.QNS.Spec
   build-depends:  base ==4.*
                 , hspec ==2.*
                 , qm-interpolated-string
