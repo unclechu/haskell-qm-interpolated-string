@@ -16,10 +16,10 @@ but ignores any indentation, line breaks
 (except explicitly written using `\n` char)
 and trailing whitespaces.
 
-* 'm' in `qm` means '<b>M</b>ultiline'.
-* 'n' in `qn` means '<b>N</b>o interpolation'.
-* 'b' in `qmb`/`qnb` means 'line <b>B</b>reaks'.
-* 's' in `qms`/`qns` means '<b>S</b>paces'.
+* 'm' in `qm` means '**M**ultiline'.
+* 'n' in `qn` means '**N**o interpolation'.
+* 'b' in `qmb`/`qnb` means 'line **B**reaks'.
+* 's' in `qms`/`qns` means '**S**paces'.
 
 Write a decoratively formatted string and your
 decorative indentation and line breaks wont go to result string,
