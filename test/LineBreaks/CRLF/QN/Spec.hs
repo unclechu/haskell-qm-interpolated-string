@@ -117,3 +117,13 @@ spec = do
   it "Haddock example" $
     [qn| foo {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"
+
+  it "Escaping backslash itself when it makes sense" $ do
+    [qn| foo\nbar   |] `shouldBe` "foo\nbar"
+    [qn| foo\\nbar  |] `shouldBe` "foo\\nbar"
+    [qn| foo\tbar   |] `shouldBe` "foo\tbar"
+    [qn| foo\\tbar  |] `shouldBe` "foo\\tbar"
+    [qn| foo\	bar   |] `shouldBe` "foo\tbar"
+    [qn| foo\\	bar |] `shouldBe` "foo\\\tbar"
+    [qn| foo\ bar   |] `shouldBe` "foo bar"
+    [qn| foo\\ bar  |] `shouldBe` "foo\\ bar"

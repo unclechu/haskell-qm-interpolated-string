@@ -94,11 +94,11 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
           , apps [fE, aE, consE [chrE '\n', varE "xs"]]
           )
 
-        -- Explicitly slicing line breaks
+        -- Explicitly cutting off line breaks
       , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
           , consP [chrP '\\', chrP '\n', varP "xs"]
 
-          , let sliceFakeLnOrUseXS maybeVal =
+          , let cutOffFakeLnOrUseXS maybeVal =
                   apps [varE "maybe", varE "xs", varE "tail", maybeVal]
 
                 clearNextLineIndentFromXS =
@@ -106,7 +106,7 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
                   apps [varE "clearIndentAtSOF", consE [chrE '\n', varE "xs"]]
 
              in -- Recursively do stuff
-                apps [fE, aE, sliceFakeLnOrUseXS clearNextLineIndentFromXS]
+                apps [fE, aE, cutOffFakeLnOrUseXS clearNextLineIndentFromXS]
           )
 
       , D ( consP [chrP '\\', chrP 'n', varP "xs"]

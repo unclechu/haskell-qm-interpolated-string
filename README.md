@@ -43,7 +43,7 @@ main = do
   -- between all of the quasi-quoters.
 
   let title = "Testing"
-      text = "Some testing text"
+      text  = "Some testing text"
 
   -- <article><h1>Testing</h1><p>Some testing text</p></article>
   putStrLn [qm|
@@ -121,6 +121,30 @@ main = do
 | `n`                  | Without interpolation            | `qn`, `qnb`, `qns` |
 | `b`                  | Keeps line breaks                | `qmb`, `qnb`       |
 | `s`                  | Replaces line breaks with spaces | `qms`, `qns`       |
+
+## About escaping
+
+### Symbols that can be escaped
+
+Backslash is used for escaping these:
+
+  1. `\n` - line break
+  2. `\ ` - space (space is supposed to be escaped when you're going to keep
+            some part of indentation)
+  3. `\↵` - backslash just before end of line cuts off line break
+            (makes sense for `qmb`, `qnb`, `qms` and `qns`)
+  4. `\{` - opening bracket of interpolation block
+            (only for `qm`, `qmb` and `qms`, to prevent interpolation
+            and interpret this block as plain text)
+  5. `\t` or `\‣` (where `‣` is real tab symbol) - tab (escaping it to keep some
+     part of indentation, or if you need tab symbol for some reason,
+     escaping real tabs makes sense only for keeping some part of indentation)
+  6. `\\` - backslash itself (for situations when you don't want to escape
+            other symbols but just want backslash symbol, `\\t`, `\\n`, `\\↵`,
+            `\\{`, etc., if backslash doesn't come with any of symbols from
+            this list it is interpreted just as backslash symbol, keep in mind
+            that `\\\` (without any of symbols from this list after)
+            and `\\\\` are producing same result - `\\`)
 
 ## More examples
 

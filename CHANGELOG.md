@@ -16,6 +16,7 @@
 * Added `qns` QuasiQuoter (`qms` without interpolation),
   it's `qn` + `s` (<b>S</b>paces),
   it works just as `qnb` but kept line breaks replaced with spaces
+* More docs and tests
 
 ## <a name="v0.1.1.0"></a>0.1.1.0
 

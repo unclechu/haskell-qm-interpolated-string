@@ -20,7 +20,7 @@ spec = do
       bar
     |] `shouldBe` "foo\n3\nbar"
 
-  it "Explicitly slicing line breaks" $ do
+  it "Explicitly cutting off line breaks" $ do
     [qmb|
       foo\
       {1+2}\
@@ -74,7 +74,7 @@ spec = do
 
   it "Empty string" $ [qmb|  |] `shouldBe` ""
 
-  it "Escaping space by slash at EOL after space (line break is sliced)" $
+  it "Escaping space by backslash at EOL after space (line break is cutted off)" $
     [qmb| foo \
           bar |] `shouldBe` "foo bar"
 
@@ -139,3 +139,13 @@ spec = do
     [qmb| foo
           {'b':'a':'r':""}
           baz |] `shouldBe` "foo\nbar\nbaz"
+
+  it "Escaping backslash itself when it makes sense" $ do
+    [qmb| foo\nbar  |] `shouldBe` "foo\nbar"
+    [qmb| foo\\nbar |] `shouldBe` "foo\\nbar"
+    [qmb| foo\tbar  |] `shouldBe` "foo\tbar"
+    [qmb| foo\\tbar |] `shouldBe` "foo\\tbar"
+    [qmb| foo\	bar |] `shouldBe` "foo\tbar"
+    [qmb| foo\\	bar |] `shouldBe` "foo\\\tbar"
+    [qmb| foo\ bar  |] `shouldBe` "foo bar"
+    [qmb| foo\\ bar |] `shouldBe` "foo\\ bar"

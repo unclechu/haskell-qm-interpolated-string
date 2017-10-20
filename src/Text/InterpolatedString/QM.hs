@@ -31,7 +31,7 @@ import qualified Text.InterpolatedString.QM.Internal.Parsers as Parsers
 --   * Line break @\\n@ (actual line breaks are ignored)
 --
 --   * Opening bracket of interpolation block @\\{@
---     to prevent interpolatin and put it as it is
+--     to prevent interpolation and put it as it is
 --     @['qm'| {1+2} \\{3+4} |] -- "3 {3+4}"@
 --
 qm :: QuasiQuoter
