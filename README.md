@@ -104,23 +104,27 @@ main = do
 
 ### All QuasiQuoters
 
+```
 | QuasiQuoter | Interpolation | Indentation | Line breaks          | Trailing whitespaces |
 |-------------|---------------|-------------|----------------------|----------------------|
-| `qm`        | ✓             | Removed     | Removed              | Removed              |
-| `qn`        | ✗             | Removed     | Removed              | Removed              |
-| `qmb`       | ✓             | Removed     | Kept                 | Removed              |
-| `qnb`       | ✗             | Removed     | Kept                 | Removed              |
-| `qms`       | ✓             | Removed     | Replaced with spaces | Removed              |
-| `qns`       | ✗             | Removed     | Replaced with spaces | Removed              |
+| qm          | ✓             | Removed     | Removed              | Removed              |
+| qn          | ✗             | Removed     | Removed              | Removed              |
+| qmb         | ✓             | Removed     | Kept                 | Removed              |
+| qnb         | ✗             | Removed     | Kept                 | Removed              |
+| qms         | ✓             | Removed     | Replaced with spaces | Removed              |
+| qns         | ✗             | Removed     | Replaced with spaces | Removed              |
+```
 
 ### About naming logic
 
-| Contains in its name | What means                       | QuasiQuoters       |
-|----------------------|----------------------------------|--------------------|
-| `m`                  | Resolves interpolation blocks    | `qm`, `qmb`, `qms` |
-| `n`                  | Without interpolation            | `qn`, `qnb`, `qns` |
-| `b`                  | Keeps line breaks                | `qmb`, `qnb`       |
-| `s`                  | Replaces line breaks with spaces | `qms`, `qns`       |
+```
+| Contains in its name | What means                       | QuasiQuoters |
+|----------------------|----------------------------------|--------------|
+| m                    | Resolves interpolation blocks    | qm, qmb, qms |
+| n                    | Without interpolation            | qn, qnb, qns |
+| b                    | Keeps line breaks                | qmb, qnb     |
+| s                    | Replaces line breaks with spaces | qms, qns     |
+```
 
 ## About escaping
 
