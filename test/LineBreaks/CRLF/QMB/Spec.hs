@@ -149,3 +149,8 @@ spec = do
     [qmb| foo\\	bar |] `shouldBe` "foo\\\tbar"
     [qmb| foo\ bar  |] `shouldBe` "foo bar"
     [qmb| foo\\ bar |] `shouldBe` "foo\\ bar"
+
+    [qmb| foo\
+          bar  |] `shouldBe` "foobar"
+    [qmb| foo\\
+          bar  |] `shouldBe` "foo\\\nbar"

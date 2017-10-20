@@ -151,3 +151,8 @@ spec = do
     [qns| foo\\	bar |] `shouldBe` "foo\\\tbar"
     [qns| foo\ bar  |] `shouldBe` "foo bar"
     [qns| foo\\ bar |] `shouldBe` "foo\\ bar"
+
+    [qns| foo\
+          bar  |] `shouldBe` "foobar"
+    [qns| foo\\
+          bar  |] `shouldBe` "foo\\ bar"

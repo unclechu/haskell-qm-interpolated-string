@@ -146,6 +146,34 @@ Backslash is used for escaping these:
             that `\\\` (without any of symbols from this list after)
             and `\\\\` are producing same result - `\\`)
 
+### Escaping examples
+
+```haskell
+[qm| foo\nbar   |] -- "foo\nbar"
+[qm| foo\\nbar  |] -- "foo\\nbar"
+[qm| foo\tbar   |] -- "foo\tbar"
+[qm| foo\\tbar  |] -- "foo\\tbar"
+[qm| foo\	bar   |] -- "foo\tbar"
+[qm| foo\\	bar |] -- "foo\\\tbar"
+[qm| foo\ bar   |] -- "foo bar"
+[qm| foo\\ bar  |] -- "foo\\ bar"
+
+[qm| foo\
+     bar  |] -- "foobar"
+[qm| foo\\
+     bar  |] -- "foo\\bar"
+
+[qmb| foo\
+      bar  |] -- "foobar"
+[qmb| foo\\
+      bar  |] -- "foo\\\nbar"
+
+[qm| foo\bar    |] -- "foo\\bar"
+[qm| foo\\bar   |] -- "foo\\bar"
+[qm| foo\\\bar  |] -- "foo\\\\bar"
+[qm| foo\\\\bar |] -- "foo\\\\bar"
+```
+
 ## More examples
 
 ```haskell
