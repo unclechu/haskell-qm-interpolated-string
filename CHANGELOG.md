@@ -1,4 +1,4 @@
-## <a name="v0.x.x.x"></a>0.x.x.x
+## <a name="v0.2.0.0"></a>0.2.0.0
 
 * Added tab (`\t`) symbol escaping
   (breaks backward compatibility with [v0.1.1.0](#v0.1.1.0))
