@@ -25,8 +25,7 @@ import "base" GHC.Exts (IsString (fromString))
 import "haskell-src-meta" Language.Haskell.Meta.Parse (parseExp)
 import qualified "template-haskell" Language.Haskell.TH as TH
 
-#if MIN_VERSION_base(4,8,0)
-#else
+#if !MIN_VERSION_base(4,8,0)
 import "base" Data.Monoid (mempty, mappend)
 #endif
 
@@ -116,5 +115,9 @@ makeExpr (AntiQuote a : xs) =
   TH.appE [| mappend (toQQ $(reify a)) |] $ makeExpr xs
   where reify :: String -> TH.Q TH.Exp
         reify s = case parseExp s of
+#if MIN_VERSION_template_haskell(2,8,0)
                        Left  e -> TH.reportError e >> [| mempty |]
+#else
+                       Left  e -> TH.report True e >> [| mempty |]
+#endif
                        Right e -> return e

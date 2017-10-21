@@ -4,7 +4,6 @@
 {-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
-{-# LANGUAGE LambdaCase #-}
 
 module Text.InterpolatedString.QM.Internal.Parsers.TH (parserTpl) where
 
@@ -64,8 +63,8 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
     decls =
 
       map    (uncurry f) $
-      map    (\case C (_, x, y) -> (x, y) ; D x -> x   ) $
-      filter (\case C (x, _, _) -> x      ; D _ -> True)
+      map    (\x -> case x of C (_, y, z) -> (y, z) ; D y -> y   ) $
+      filter (\x -> case x of C (y, _, _) -> y      ; D _ -> True)
 
       [ D ( ListP []
           , ListE [apps [conE "Literal", apps [varE "reverse", aE]]]
