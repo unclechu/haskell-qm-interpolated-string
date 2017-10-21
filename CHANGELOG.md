@@ -1,3 +1,8 @@
+## <a name="v0.2.1.0"></a>0.2.1.0
+
+* Support GHC 7.4.1
+* Internal modules moved to `other-modules` section
+
 ## <a name="v0.2.0.0"></a>0.2.0.0
 
 * Added tab (`\t`) symbol escaping

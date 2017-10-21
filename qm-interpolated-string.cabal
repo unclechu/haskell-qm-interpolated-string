@@ -1,5 +1,5 @@
 name:               qm-interpolated-string
-version:            0.2.0.0
+version:            0.2.1.0
 synopsis:           Implementation of interpolated multiline strings
 description:        Implementation of interpolated multiline strings
                     that ignores indentation and trailing whitespaces
@@ -28,11 +28,11 @@ library
   ghc-options:     -Wall
   hs-source-dirs:  src
   exposed-modules: Text.InterpolatedString.QM
-                 , Text.InterpolatedString.QM.Internal.Parsers
+                 , Text.InterpolatedString.QM.ShowQ.Class
+  other-modules:   Text.InterpolatedString.QM.Internal.Parsers
                  , Text.InterpolatedString.QM.Internal.Parsers.TH
                  , Text.InterpolatedString.QM.Internal.Parsers.Types
                  , Text.InterpolatedString.QM.Internal.Parsers.Helpers
-                 , Text.InterpolatedString.QM.ShowQ.Class
   build-depends:   base ==4.*
                  , template-haskell >=2.5 && <3
                  , haskell-src-meta >=0.3 && <0.9
