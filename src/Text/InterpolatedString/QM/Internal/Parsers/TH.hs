@@ -1,7 +1,6 @@
 -- Fork of: https://github.com/audreyt/interpolatedstring-perl6/blob/63d91a83eb5e48740c87570a8c7fd4668afE6832/src/Text/InterpolatedString/Perl6.hs
 -- Author of the 'interpolatedstring-perl6' package: Audrey Tang
 
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
 
@@ -62,17 +61,51 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
 
     decls =
 
-      map    (uncurry f) $
-      map    (\x -> case x of C (_, y, z) -> (y, z) ; D y -> y   ) $
-      filter (\x -> case x of C (y, _, _) -> y      ; D _ -> True)
+      let
+        -- Filtering truthy conditional patterns,
+        -- collecting declarative
+        -- and applying `f`.
+        reducer x acc = case x of
+                             C (True, pat, body) -> f pat body : acc
+                             D (      pat, body) -> f pat body : acc
+                             _                   -> acc -- Skipping
 
-      [ D ( ListP []
+      in
+
+      -- All patterns here are prefixed with "a" (`aE`) accumulator.
+      --
+      -- Means:
+      --   ```
+      --   D ( consP [varP "x", varP "xs"]
+      --     , apps [fE, consE [varE "x", aE], varE "xs"]
+      --     )
+      --   ```
+      -- will be for example:
+      --   ```
+      --   parseQM a (x:xs) = parseQM (x:a) xs
+      --   ```
+      foldr reducer [] [
+
+        D ( ListP []
           , ListE [apps [conE "Literal", apps [varE "reverse", aE]]]
           )
 
       , C ( lineBreaks `elem` [KeepLineBreaks, ReplaceLineBreaksWithSpaces]
           , ViewP (varE "clearLastQXXLineBreak") $ conP "True" []
           , apps [fE, aE, strE ""]
+          )
+
+        -- Cutting '\r' symbols off.
+        -- Doing it here (also in '.Helpers' module) to prevent touching
+        -- anything inside interpolation block, to make it be just pure
+        -- untouched haskell code, with minimal specific details (such as
+        -- ability to escape close bracket `\}` to prevent interpolation block
+        -- from closing.
+      , D ( consP [varP "x", chrP '\r', chrP '\n', varP "xs"]
+          , apps [fE, aE, consE [varE "x", chrE '\n', varE "xs"]]
+          )
+      , D ( consP [chrP '\r', chrP '\n', varP "xs"]
+          , apps [fE, aE, consE [chrE '\n', varE "xs"]]
           )
 
       , D ( consP [chrP '\\', chrP '\\', varP "xs"]

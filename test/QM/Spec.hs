@@ -1,3 +1,5 @@
+-- WARNING! Do not remove trailing whitespace or tabs, it's part of the test!
+
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE QuasiQuotes #-}
 
@@ -7,6 +9,9 @@ import "hspec" Test.Hspec (Spec, describe, it, shouldBe)
 
 -- local imports
 import "qm-interpolated-string" Text.InterpolatedString.QM (qm)
+
+newtype TestFoo = TestFoo {testBar :: Int} deriving (Show)
+testFoo = TestFoo 42
 
 
 spec :: Spec
@@ -35,29 +40,62 @@ spec = do
     it "Fourth (escaping interpolation blocks to show them as text)" $
       [qm| {1+2} \{3+4} |] `shouldBe` "3 {3+4}"
 
-  it "Type annotation in interpolation block" $
-    [qm|{10 :: Float}|] `shouldBe` "10.0"
-
-  it "Escaping interpolation symbols inside interpolation block" $ do
-    [qm|foo {"b{a{r"} baz|]   `shouldBe` "foo b{a{r baz"
-    [qm|foo {"b\}a\}r"} baz|] `shouldBe` "foo b}a}r baz"
+  it "Empty string" $ [qm|  |] `shouldBe` ""
 
   it "Example from generated docs" $ [qm| foo {'b':'a':'r':""}
                                         \ baz |] `shouldBe` "foo bar baz"
 
-  it "Escaping backslashes" $ do [qm| foo\bar |]    `shouldBe` "foo\\bar"
-                                 [qm| foo\\bar |]   `shouldBe` "foo\\bar"
-                                 [qm| foo\\\bar |]  `shouldBe` "foo\\\\bar"
-                                 [qm| foo\\\\bar |] `shouldBe` "foo\\\\bar"
+  it "Type annotation in interpolation block" $
+    [qm|{10 :: Float}|] `shouldBe` "10.0"
 
-  it "Empty string" $ [qm|  |] `shouldBe` ""
+  describe "Escaping" $ do
 
-  it "Escaping space by slash at EOL after space" $
-    [qm| foo \
-         bar |] `shouldBe` "foo bar"
+    it "Escaping interpolation symbols inside interpolation block" $ do
+      [qm|foo {"b{a{r"} baz|]   `shouldBe` "foo b{a{r baz"
+      [qm|foo {"b\}a\}r"} baz|] `shouldBe` "foo b}a}r baz"
 
-  it "Escaped spaces at the edges" $ do [qm| foo\ |] `shouldBe` "foo "
-                                        [qm|\ foo |] `shouldBe` " foo"
+    it "Escaping backslashes" $ do [qm| foo\bar |]    `shouldBe` "foo\\bar"
+                                   [qm| foo\\bar |]   `shouldBe` "foo\\bar"
+                                   [qm| foo\\\bar |]  `shouldBe` "foo\\\\bar"
+                                   [qm| foo\\\\bar |] `shouldBe` "foo\\\\bar"
+
+    it "Escaping space by slash at EOL after space" $
+      [qm| foo \
+           bar |] `shouldBe` "foo bar"
+
+    it "Escaped spaces at the edges" $ do [qm| foo\ |] `shouldBe` "foo "
+                                          [qm|\ foo |] `shouldBe` " foo"
+
+    it "Escaping backslash itself when it makes sense" $ do
+      [qm| foo\nbar   |] `shouldBe` "foo\nbar"
+      [qm| foo\\nbar  |] `shouldBe` "foo\\nbar"
+      [qm| foo\tbar   |] `shouldBe` "foo\tbar"
+      [qm| foo\\tbar  |] `shouldBe` "foo\\tbar"
+      [qm| foo\	bar   |] `shouldBe` "foo\tbar"
+      [qm| foo\\	bar |] `shouldBe` "foo\\\tbar"
+      [qm| foo\ bar   |] `shouldBe` "foo bar"
+      [qm| foo\\ bar  |] `shouldBe` "foo\\ bar"
+
+      [qm| foo\
+           bar  |] `shouldBe` "foobar"
+      [qm| foo\\
+           bar  |] `shouldBe` "foo\\bar"
+
+    describe "Escaping inside interpolation blocks" $ do
+
+      -- TODO More tests for interpolation blocks
+      it "Line-breaks must be interpreted as just haskell code" $
+        [qm| {"foo\nbar"} |] `shouldBe` "foo\nbar"
+
+      it "Escaping of close-bracket '}'" $
+        [qm| { testFoo {testBar = 9000\} } |]
+          `shouldBe` show (testFoo {testBar = 9000})
+
+      it "When interpolation block is escaped\
+         \ everything must be interpreted as usual" $ do
+        [qm| \{ foo\nbar\\baz\} } |] `shouldBe` "{ foo\nbar\\baz\\} }"
+        [qm| \{ foo\
+                bar } |] `shouldBe` "{ foobar }"
 
   describe "Tabs as indentation" $ do
 
@@ -117,7 +155,7 @@ spec = do
         `shouldBe`
           "you can escape spaces when you need them"
 
-    it "Indentation and line breaks are ignored" $ 
+    it "Indentation and line breaks are ignored" $
       [qm|
               indentation and li
         ne bre
@@ -143,18 +181,3 @@ spec = do
   it "Haddock example" $
     [qm| foo {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo bar baz"
-
-  it "Escaping backslash itself when it makes sense" $ do
-    [qm| foo\nbar   |] `shouldBe` "foo\nbar"
-    [qm| foo\\nbar  |] `shouldBe` "foo\\nbar"
-    [qm| foo\tbar   |] `shouldBe` "foo\tbar"
-    [qm| foo\\tbar  |] `shouldBe` "foo\\tbar"
-    [qm| foo\	bar   |] `shouldBe` "foo\tbar"
-    [qm| foo\\	bar |] `shouldBe` "foo\\\tbar"
-    [qm| foo\ bar   |] `shouldBe` "foo bar"
-    [qm| foo\\ bar  |] `shouldBe` "foo\\ bar"
-
-    [qm| foo\
-         bar  |] `shouldBe` "foobar"
-    [qm| foo\\
-         bar  |] `shouldBe` "foo\\bar"

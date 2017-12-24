@@ -38,71 +38,72 @@ import Text.InterpolatedString.QM.Internal.Parsers.Types ( Parser
                                                          )
 
 
-class QQ a string where
-  toQQ :: a -> string
-
-instance IsString s => QQ s s where
-  toQQ = id
-
-instance (ShowQ a, IsString s) => QQ a s where
-  toQQ = fromString . showQ
+class    QQ a string                     where toQQ :: a -> string
+instance IsString s => QQ s s            where toQQ = id
+instance (ShowQ a, IsString s) => QQ a s where toQQ = fromString . showQ
 
 
 -- Parser for interpolation block
 unQX :: Parser -> Parser
-unQX _ a ""          = [Literal (reverse a)]
-unQX f a ('\\':x:xs) = unQX f (x:a) xs
-unQX f a ("\\")      = unQX f ('\\':a) ""
-unQX f a ('}':xs)    = AntiQuote (reverse a) : f "" xs
-unQX f a (x:xs)      = unQX f (x:a) xs
+unQX _ a ""            = [Literal (reverse a)] -- Error, block isn't closed
+unQX f a ('\\':'}':xs) = unQX f ('}':a) xs
+unQX f a ('}':xs)      = AntiQuote (reverse a) : f "" xs
+unQX f a (x:xs)        = unQX f (x:a) xs
 
 
 clearIndentAtSOF :: String -> Maybe String
-clearIndentAtSOF ""                                 = Nothing
+clearIndentAtSOF "" = Nothing
+clearIndentAtSOF ('\r':'\n':xs) = clearIndentAtSOF $ '\n' : xs
 clearIndentAtSOF s@(x:xs) | x == '\n' && hasChanges = Just processed
                           | otherwise               = Nothing
 
   where processed  = '\n' : cutOff xs
         hasChanges = processed /= s
 
-        cutOff ""                        = ""
+        cutOff "" = ""
         cutOff z@(y:ys) | y `elem` "\t " = cutOff ys
                         | otherwise      = z
 
 
 clearIndentTillEOF :: String -> Maybe String
-clearIndentTillEOF ""                       = Nothing
+clearIndentTillEOF "" = Nothing
 clearIndentTillEOF s@(x:_) | x `elem` "\t " = cutOff s
                            | otherwise      = Nothing
 
-  where cutOff ""                      = Just ""
-        cutOff z@('\n':_)              = Just z
+  where cutOff "" = Just ""
+        cutOff ('\r':'\n':xs) = cutOff $ '\n' : xs
+        cutOff z@('\n':_) = Just z
         cutOff (y:ys) | y `elem` "\t " = cutOff ys
                       | otherwise      = Nothing
 
 
 clearLastQXXLineBreak :: String -> Bool
 -- Cannot really be empty (matched in `parseQMB`)
-clearLastQXXLineBreak ""                        = False
-clearLastQXXLineBreak (x:xs) | x `elem` "\t\n " = f xs
+clearLastQXXLineBreak "" = False
+clearLastQXXLineBreak ('\r':'\n':xs) = clearLastQXXLineBreak $ '\n' : xs
+clearLastQXXLineBreak (x:xs) | x `elem` "\t \n" = f xs
                              | otherwise        = False
 
-  where f ""                        = True
-        f (y:ys) | y `elem` "\t\n " = f ys
+  where f "" = True
+        f ('\r':'\n':ys) = f $ '\n' : ys
+        f (y:ys) | y `elem` "\t \n" = f ys
                  | otherwise        = False
 
 
 clearFirstQXXLineBreak :: String -> String
-clearFirstQXXLineBreak ""                          = ""
-clearFirstQXXLineBreak s@(x:xs) | x `elem` "\t\n " = cutOff xs
+clearFirstQXXLineBreak "" = ""
+clearFirstQXXLineBreak ('\r':'\n':xs) = clearFirstQXXLineBreak $ '\n' : xs
+clearFirstQXXLineBreak s@(x:xs) | x `elem` "\t \n" = cutOff xs
                                 | otherwise        = s
-  where cutOff ""                          = ""
-        cutOff c@(y:ys) | y `elem` "\t\n " = cutOff ys
+
+  where cutOff "" = ""
+        cutOff ('\r':'\n':ys) = cutOff $ '\n' : ys
+        cutOff c@(y:ys) | y `elem` "\t \n" = cutOff ys
                         | otherwise        = c
 
 
 clearIndentAtStart :: String -> String
-clearIndentAtStart ""                        = ""
+clearIndentAtStart "" = ""
 clearIndentAtStart s@(x:xs) | x `elem` "\t " = clearIndentAtStart xs
                             | otherwise      = s
 
@@ -116,8 +117,8 @@ makeExpr (AntiQuote a : xs) =
   where reify :: String -> TH.Q TH.Exp
         reify s = case parseExp s of
 #if MIN_VERSION_template_haskell(2,8,0)
-                       Left  e -> TH.reportError e >> [| mempty |]
+                       Left  err  -> TH.reportError err >> [| mempty |]
 #else
-                       Left  e -> TH.report True e >> [| mempty |]
+                       Left  err  -> TH.report True err >> [| mempty |]
 #endif
-                       Right e -> return e
+                       Right expr -> return expr
