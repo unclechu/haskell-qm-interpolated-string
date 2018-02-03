@@ -1,3 +1,6 @@
+-- WARNING! Do not remove trailing whitespace or tabs, it's part of the test!
+{-# OPTIONS_GHC -fno-warn-tabs #-}
+
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE QuasiQuotes #-}
 

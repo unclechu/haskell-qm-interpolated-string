@@ -1,4 +1,5 @@
 -- WARNING! Do not remove trailing whitespace or tabs, it's part of the test!
+{-# OPTIONS_GHC -fno-warn-tabs #-}
 
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE QuasiQuotes #-}
@@ -11,7 +12,13 @@ import "hspec" Test.Hspec (Spec, describe, it, shouldBe)
 import "qm-interpolated-string" Text.InterpolatedString.QM (qm)
 
 newtype TestFoo = TestFoo {testBar :: Int} deriving (Show)
+newtype TestFoo2 = TestFoo2 {test1 :: TestFoo} deriving (Show)
+
+testFoo :: TestFoo
 testFoo = TestFoo 42
+
+testFoo2 :: TestFoo2
+testFoo2 = TestFoo2 testFoo
 
 
 spec :: Spec
@@ -83,19 +90,52 @@ spec = do
 
     describe "Escaping inside interpolation blocks" $ do
 
-      -- TODO More tests for interpolation blocks
-      it "Line-breaks must be interpreted as just haskell code" $
-        [qm| {"foo\nbar"} |] `shouldBe` "foo\nbar"
+      it "Line-breaks must be interpreted as just haskell code" $ do
+        [qm| {'\n'}          |] `shouldBe` "\n"
+        [qm| {"foo\nbar"}    |] `shouldBe` "foo\nbar"
+        [qm| {"foo\\nbar"}   |] `shouldBe` "foo\\nbar"
+        [qm| {"foo\\\nbar"}  |] `shouldBe` "foo\\\nbar"
+        [qm| {"foo\\\\nbar"} |] `shouldBe` "foo\\\\nbar"
 
-      it "Escaping of close-bracket '}'" $
+      it "Escaping for multiline strings" $ do
+        [qm| {"foo\
+              \bar\
+              \baz"} |] `shouldBe` "foobarbaz"
+        [qm| {"foo \
+              \bar\
+              \ baz"} |] `shouldBe` "foo bar baz"
+        [qm| x  \
+             {"foo \
+             \bar\
+             \ baz"}  \
+             y |] `shouldBe` "x  foo bar baz  y"
+
+      it "Escaping of close-bracket '}'" $ do
         [qm| { testFoo {testBar = 9000\} } |]
-          `shouldBe` show (testFoo {testBar = 9000})
+          `shouldBe` show testFoo {testBar = 9000}
+        [qm| foo{ testFoo {testBar = 9000\} }bar |]
+          `shouldBe` "foo" ++ show testFoo {testBar = 9000} ++ "bar"
+        [qm|foo{testFoo2 {test1 = (test1 testFoo2) {testBar = 9000\}\}}bar|]
+          `shouldBe` "foo" ++ show testFoo2 {test1 = TestFoo 9000} ++ "bar"
+        [qm| foo { testFoo2 {
+               test1 = (test1 testFoo2)
+                       { testBar = 9000 \}
+                           \}
+                 } bar |]
+          `shouldBe` "foo " ++ show testFoo2 {test1 = TestFoo 9000} ++ " bar"
+        [qm| {"\}"} |] `shouldBe` "}"
+        [qm| {"\\\}"} |] `shouldBe` "\\}"
 
       it "When interpolation block is escaped\
          \ everything must be interpreted as usual" $ do
         [qm| \{ foo\nbar\\baz\} } |] `shouldBe` "{ foo\nbar\\baz\\} }"
         [qm| \{ foo\
                 bar } |] `shouldBe` "{ foobar }"
+
+      it "Tabs characters in string inside interpolation block" $ do
+        [qm| {"foo\t\tbar" } |] `shouldBe` "foo\t\tbar"
+        [qm| {"foo		bar" } |] `shouldBe` "foo\t\tbar"
+        [qm| {"foo\\t\tbar"} |] `shouldBe` "foo\\t\tbar"
 
   describe "Tabs as indentation" $ do
 
