@@ -38,33 +38,98 @@ spec = do
     it "Fourth (escaping interpolation blocks to show them as text)" $
       [qn| {1+2} \{3+4} |] `shouldBe` "{1+2} \\{3+4}"
 
-    it "Example of `qn` QuasiQuoter" $
-      [qn| foo {1+2} |] `shouldBe` "foo {1+2}"
+  it "Empty string" $ [qn|  |] `shouldBe` ""
 
   it "Type annotation in interpolation block" $
     [qn|{10 :: Float}|] `shouldBe` "{10 :: Float}"
 
-  it "Escaping interpolation symbols inside interpolation block" $ do
-    [qn|foo {"b{a{r"} baz|] `shouldBe` "foo {\"b{a{r\"} baz"
-    [qn|foo {"b\}a\}r"} baz|] `shouldBe` "foo {\"b\\}a\\}r\"} baz"
+  describe "Escaping" $ do
 
-  it "Example from generated docs" $
-    [qn| foo {'b':'a':'r':""}
-       \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"
+    it "Escaping interpolation symbols inside interpolation block" $ do
+      [qn|foo {"b{a{r"} baz|] `shouldBe` "foo {\"b{a{r\"} baz"
+      [qn|foo {"b\}a\}r"} baz|] `shouldBe` "foo {\"b\\}a\\}r\"} baz"
 
-  it "Escaping backslashes" $ do [qn| foo\bar |]    `shouldBe` "foo\\bar"
-                                 [qn| foo\\bar |]   `shouldBe` "foo\\bar"
-                                 [qn| foo\\\bar |]  `shouldBe` "foo\\\\bar"
-                                 [qn| foo\\\\bar |] `shouldBe` "foo\\\\bar"
+    it "Escaping backslashes" $ do [qn| foo\bar |]    `shouldBe` "foo\\bar"
+                                   [qn| foo\\bar |]   `shouldBe` "foo\\bar"
+                                   [qn| foo\\\bar |]  `shouldBe` "foo\\\\bar"
+                                   [qn| foo\\\\bar |] `shouldBe` "foo\\\\bar"
 
-  it "Empty string" $ [qn|  |] `shouldBe` ""
+    it "Escaping space by slash at EOL after space" $
+      [qn| foo \
+           bar |] `shouldBe` "foo bar"
 
-  it "Escaping space by slash at EOL after space" $
-    [qn| foo \
-         bar |] `shouldBe` "foo bar"
+    it "Escaped spaces at the edges" $ do [qn| foo\ |] `shouldBe` "foo "
+                                          [qn|\ foo |] `shouldBe` " foo"
 
-  it "Escaped spaces at the edges" $ do [qn| foo\ |] `shouldBe` "foo "
-                                        [qn|\ foo |] `shouldBe` " foo"
+    it "Escaping backslash itself when it makes sense" $ do
+      [qn| foo\nbar   |] `shouldBe` "foo\nbar"
+      [qn| foo\\nbar  |] `shouldBe` "foo\\nbar"
+      [qn| foo\tbar   |] `shouldBe` "foo\tbar"
+      [qn| foo\\tbar  |] `shouldBe` "foo\\tbar"
+      [qn| foo\	bar   |] `shouldBe` "foo\tbar"
+      [qn| foo\\	bar |] `shouldBe` "foo\\\tbar"
+      [qn| foo\ bar   |] `shouldBe` "foo bar"
+      [qn| foo\\ bar  |] `shouldBe` "foo\\ bar"
+
+      [qn| foo\
+           bar  |] `shouldBe` "foobar"
+      [qn| foo\\
+           bar  |] `shouldBe` "foo\\bar"
+
+    -- By 'not really' it means we just shows here what happens with examples
+    -- for QM when we use them with QN quoter.
+    describe "Escaping inside interpolation blocks (not really!)" $ do
+
+      it "Line-breaks must be interpreted as just haskell code\
+         \ (not really!)" $ do
+        [qn| {'\n'}          |] `shouldBe` "{'\n'}"
+        [qn| {"foo\nbar"}    |] `shouldBe` "{\"foo\nbar\"}"
+        [qn| {"foo\\nbar"}   |] `shouldBe` "{\"foo\\nbar\"}"
+        [qn| {"foo\\\nbar"}  |] `shouldBe` "{\"foo\\\nbar\"}"
+        [qn| {"foo\\\\nbar"} |] `shouldBe` "{\"foo\\\\nbar\"}"
+
+      it "Escaping for multiline strings" $ do
+        [qn| {"foo\
+              \bar\
+              \baz"} |] `shouldBe` "{\"foo\\bar\\baz\"}"
+        [qn| {"foo \
+              \bar\
+              \ baz"} |] `shouldBe` "{\"foo \\bar baz\"}"
+        [qn| x  \
+             {"foo \
+             \bar\
+             \ baz"}  \
+             y |] `shouldBe` "x  {\"foo \\bar baz\"}  y"
+
+      it "Escaping of close-bracket '}'" $ do
+        [qn| { testFoo {testBar = 9000\} } |]
+          `shouldBe` "{ testFoo {testBar = 9000\\} }"
+        [qn| foo{ testFoo {testBar = 9000\} }bar |]
+          `shouldBe` "foo{ testFoo {testBar = 9000\\} }bar"
+        [qn|foo{testFoo2 {test1 = (test1 testFoo2) {testBar = 9000\}\}}bar|]
+          `shouldBe`
+            "foo{testFoo2 {test1 = (test1 testFoo2) {testBar = 9000\\}\\}}bar"
+        [qn| foo { testFoo2 {
+               test1 = (test1 testFoo2)
+                       { testBar = 9000 \}
+                           \}
+                 } bar |]
+          `shouldBe` "foo { testFoo2 {test1 = (test1 testFoo2)\
+                     \{ testBar = 9000 \\}\\}} bar"
+        [qn| {"\}"}   |] `shouldBe` "{\"\\}\"}"
+        [qn| {"\\\}"} |] `shouldBe` "{\"\\\\}\"}"
+
+      it "When interpolation block is escaped\
+         \ everything must be interpreted as usual (not really)" $ do
+        [qn| \{ foo\nbar\\baz\} } |] `shouldBe` "\\{ foo\nbar\\baz\\} }"
+        [qn| \{ foo\
+                bar } |] `shouldBe` "\\{ foobar }"
+
+      it "Tabs characters in string inside interpolation block\
+         \ (not really!)" $ do
+        [qn| {"foo\t\tbar" } |] `shouldBe` "{\"foo\t\tbar\" }"
+        [qn| {"foo		bar" } |] `shouldBe` "{\"foo\t\tbar\" }"
+        [qn| {"foo\\t\tbar"} |] `shouldBe` "{\"foo\\t\tbar\"}"
 
   describe "Tabs as indentation" $ do
 
@@ -106,7 +171,7 @@ spec = do
 
   describe "New README examples" $ do
 
-    it "Simple usage example" $ do
+    it "Simple usage example" $
       [qn|
         <article>
           <h1>{title}</h1>
@@ -114,23 +179,35 @@ spec = do
         </article>
       |] `shouldBe` "<article><h1>{title}</h1><p>{text}</p></article>"
 
+    it "Can escape spaces" $
+      [qn|   you can escape spaces
+           \ when you need them    |]
+        `shouldBe`
+          "you can escape spaces when you need them"
+
+    it "Indentation and line breaks are ignored" $
+      [qn|
+              indentation and li
+        ne bre
+         aks are i
+             gno
+           red
+      |]
+      `shouldBe` "indentation and line breaks are ignored"
+
+    it "Escaping indentation or line breaks" $
+      [qn|  \  You can escape indentation or\n
+               line breaks when you need them! \  |]
+        `shouldBe`
+          "  You can escape indentation or\nline breaks when you need them!  "
+
+    it "Interpolation blocks can be escaped too" $
+      [qn| Interpolation blocks can be escaped too: {1+2} \{3+4} |]
+        `shouldBe`
+          "Interpolation blocks can be escaped too: {1+2} \\{3+4}"
+
     it "Interpolation" $ [qn| foo {1+2} |] `shouldBe` "foo {1+2}"
 
   it "Haddock example" $
     [qn| foo {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"
-
-  it "Escaping backslash itself when it makes sense" $ do
-    [qn| foo\nbar   |] `shouldBe` "foo\nbar"
-    [qn| foo\\nbar  |] `shouldBe` "foo\\nbar"
-    [qn| foo\tbar   |] `shouldBe` "foo\tbar"
-    [qn| foo\\tbar  |] `shouldBe` "foo\\tbar"
-    [qn| foo\	bar   |] `shouldBe` "foo\tbar"
-    [qn| foo\\	bar |] `shouldBe` "foo\\\tbar"
-    [qn| foo\ bar   |] `shouldBe` "foo bar"
-    [qn| foo\\ bar  |] `shouldBe` "foo\\ bar"
-
-    [qn| foo\
-         bar  |] `shouldBe` "foobar"
-    [qn| foo\\
-         bar  |] `shouldBe` "foo\\bar"

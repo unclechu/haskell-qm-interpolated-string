@@ -50,9 +50,6 @@ spec = do
 
   it "Empty string" $ [qm|  |] `shouldBe` ""
 
-  it "Example from generated docs" $ [qm| foo {'b':'a':'r':""}
-                                        \ baz |] `shouldBe` "foo bar baz"
-
   it "Type annotation in interpolation block" $
     [qm|{10 :: Float}|] `shouldBe` "10.0"
 
@@ -124,7 +121,7 @@ spec = do
                            \}
                  } bar |]
           `shouldBe` "foo " ++ show testFoo2 {test1 = TestFoo 9000} ++ " bar"
-        [qm| {"\}"} |] `shouldBe` "}"
+        [qm| {"\}"}   |] `shouldBe` "}"
         [qm| {"\\\}"} |] `shouldBe` "\\}"
 
       it "When interpolation block is escaped\
