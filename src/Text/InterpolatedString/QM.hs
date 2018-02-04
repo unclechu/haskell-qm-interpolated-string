@@ -68,6 +68,18 @@ qn = QuasiQuoter Parsers.qn
 --       baz |] -- "foo\\nbar\\nbaz"
 -- @
 --
+-- Keep in mind that this example:
+--
+-- @
+-- ['qmb'|
+--   foo
+--   bar
+-- |]
+-- @
+--
+-- Won't produce @"foo\\nbar\\n"@ nor @"\\nfor\\nbar\\n"@ but @"foo\\nbar"@, it
+-- means it separates "between" the lines not by edges.
+--
 qmb :: QuasiQuoter
 qmb = QuasiQuoter Parsers.qmb
   (error "Cannot use 'qmb' as a pattern")
@@ -83,6 +95,19 @@ qmb = QuasiQuoter Parsers.qmb
 --       {'b':'a':'r':""}
 --       baz |] -- "foo\\n{'b':'a':'r':\\"\\"}\\nbaz"
 -- @
+--
+-- Keep in mind that this example:
+--
+-- @
+-- ['qnb'|
+--   foo
+--   bar
+-- |]
+-- @
+--
+-- Won't produce @"foo\\nbar\\n"@ nor @"\\nfor\\nbar\\n"@ but @"foo\\nbar"@, it
+-- means it separates "between" the lines not by edges.
+--
 qnb :: QuasiQuoter
 qnb = QuasiQuoter Parsers.qnb
   (error "Cannot use 'qnb' as a pattern")
@@ -97,6 +122,19 @@ qnb = QuasiQuoter Parsers.qnb
 --       {'b':'a':'r':""}
 --       baz |] -- "foo bar baz"
 -- @
+--
+-- Keep in mind that this example:
+--
+-- @
+-- ['qms'|
+--   foo
+--   bar
+-- |]
+-- @
+--
+-- Won't produce @"foo bar "@ nor @" for bar "@ but @"foo bar"@, it
+-- means it separates "between" the lines not by edges.
+--
 qms :: QuasiQuoter
 qms = QuasiQuoter Parsers.qms
   (error "Cannot use 'qms' as a pattern")
@@ -113,6 +151,19 @@ qms = QuasiQuoter Parsers.qms
 --       {'b':'a':'r':""}
 --       baz |] -- "foo {'b':'a':'r':\\"\\"} baz"
 -- @
+--
+-- Keep in mind that this example:
+--
+-- @
+-- ['qns'|
+--   foo
+--   bar
+-- |]
+-- @
+--
+-- Won't produce @"foo bar "@ nor @" for bar "@ but @"foo bar"@, it
+-- means it separates "between" the lines not by edges.
+--
 qns :: QuasiQuoter
 qns = QuasiQuoter Parsers.qns
   (error "Cannot use 'qns' as a pattern")
