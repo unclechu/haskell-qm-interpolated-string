@@ -126,6 +126,27 @@ main = do
 | s                    | Replaces line breaks with spaces | qms, qns     |
 ```
 
+## About interpolation blocks
+
+Along with all specifics of any of the quoters (which supports interpolation
+blocks, which has `m` in their names) interpolation blocks work different. When
+curly bracket (`{`) opens everything inside until it closes (by `}`) is parsed
+as bare as possible to be given to
+[haskell-src-meta](http://hackage.haskell.org/package/haskell-src-meta)
+without any modifications, to be parsed as bare haskell code.
+
+But you might need use curly brackets inside an interpolation block. I don't
+think it would be a good idea, because complicated logic there may cause code
+readability issues, but if you're sure you need it then you get it. You just
+need to escape closing bracket to prevent interpolation block from closing, like
+this: `\}`. I know it could parsed and opening curly brackets inside could be
+used to prevent closing by next `}` symbol, but I chose do it this way to
+prevent any unobvious tricky behavior (e.g. consider `}` appear inside a string,
+`[qm|foo {'x':'}':"y"} bar|]`, how that should be handled?). So I've decided to
+not make parser to be very smart, just to follow simple logic. You just need to
+explicitly escape every `}` symbol inside that isn't closer of an interpolation
+block (you could find an example below).
+
 ## About escaping
 
 ### Symbols that can be escaped
@@ -149,6 +170,10 @@ Backslash is used for escaping these:
             this list it is interpreted just as backslash symbol, keep in mind
             that `\\\` (without any of symbols from this list after)
             and `\\\\` are producing same result - `\\`)
+  7. `\}` - closing bracket inside an interpolation block
+            (it works **only** inside opened interpolation block)
+            to prevent interpolation block from closing
+            (useful to escape records modification)
 
 ### Escaping examples
 
@@ -219,6 +244,17 @@ If you don't need interpolation - just replace `m` to `n` in quasi-quoter name:
 
 [qmb| foo {1+2} |] -- Result: "foo 3"
 [qnb| foo {1+2} |] -- Result: "foo {1+2}"
+```
+
+That's how you update some record inside interpolation block
+(you need to escape closing bracket):
+
+```haskell
+{-# LANGUAGE QuasiQuotes #-}
+import Text.InterpolatedString.QM (qm)
+data Foo = Foo {bar :: Int, baz :: Int} deriving Show
+main = let foo = Foo 10 20 in putStrLn [qm| Foo is: {foo {baz = 30\}} |]
+-- Foo is: Foo {bar = 10, baz = 30}
 ```
 
 ## Author
