@@ -1,5 +1,9 @@
 ## <a name="v0.3.0.0"></a>0.3.0.0
 
+* Testing on GHC 8.2.2
+
+### **WARNING!** Breaking changes
+
 * TODO explain better: Breaking change of interpolation blocks
 * TODO explain better: Quoters no longer removes every *CR* (`\r`), but just
     supports *CRLF* (`\r\n`) line-breaks
