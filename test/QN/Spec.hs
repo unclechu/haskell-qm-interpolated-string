@@ -118,6 +118,7 @@ spec = do
                      \{ testBar = 9000 \\}\\}} bar"
         [qn| {"\}"}   |] `shouldBe` "{\"\\}\"}"
         [qn| {"\\\}"} |] `shouldBe` "{\"\\\\}\"}"
+        [qn| {123}}   |] `shouldBe` "{123}}"
 
       it "When interpolation block is escaped\
          \ everything must be interpreted as usual (not really)" $ do

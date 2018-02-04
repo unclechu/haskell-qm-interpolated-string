@@ -123,6 +123,7 @@ spec = do
           `shouldBe` "foo " ++ show testFoo2 {test1 = TestFoo 9000} ++ " bar"
         [qm| {"\}"}   |] `shouldBe` "}"
         [qm| {"\\\}"} |] `shouldBe` "\\}"
+        [qm| {123}}   |] `shouldBe` "123}"
 
       it "When interpolation block is escaped\
          \ everything must be interpreted as usual" $ do
