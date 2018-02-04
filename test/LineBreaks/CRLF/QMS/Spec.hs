@@ -155,7 +155,7 @@ spec = do
 
       it "Tabs characters in string inside interpolation block" $ do
         [qms| {"foo\t\tbar" } |] `shouldBe` "foo\t\tbar"
-        [qms| {"foo		bar" } |] `shouldBe` "foo\t\tbar"
+        [qms| {"foo		bar"  } |] `shouldBe` "foo\t\tbar"
         [qms| {"foo\\t\tbar"} |] `shouldBe` "foo\\t\tbar"
 
   describe "Tabs as indentation" $ do
@@ -248,7 +248,12 @@ spec = do
 
     it "Interpolation" $ [qms| foo {1+2} |] `shouldBe` "foo 3"
 
-  it "Haddock example" $
+  it "Haddock example" $ do
+    [qms| foo {'b':'a':'r':""}
+          baz |] `shouldBe` "foo bar baz"
     [qms| foo
           {'b':'a':'r':""}
           baz |] `shouldBe` "foo bar baz"
+    -- Double-space with escaping
+    [qms| foo {'b':'a':'r':""}
+        \ baz |] `shouldBe` "foo bar  baz"

@@ -215,6 +215,9 @@ spec = do
 
     it "Interpolation" $ [qn| foo {1+2} |] `shouldBe` "foo {1+2}"
 
-  it "Haddock example" $
+  it "Haddock example" $ do
     [qn| foo {'b':'a':'r':""}
+       \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"
+    [qn| foo
+       \ {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"

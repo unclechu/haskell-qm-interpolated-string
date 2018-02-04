@@ -222,6 +222,9 @@ spec = do
 
     it "Interpolation" $ [qm| foo {1+2} |] `shouldBe` "foo 3"
 
-  it "Haddock example" $
+  it "Haddock example" $ do
     [qm| foo {'b':'a':'r':""}
+       \ baz |] `shouldBe` "foo bar baz"
+    [qm| foo
+       \ {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo bar baz"
