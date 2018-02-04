@@ -229,3 +229,5 @@ spec = do
     [qm| foo
        \ {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo bar baz"
+    [qm| foo {'b':'a':'r':""}
+         baz |] `shouldBe` "foo barbaz"

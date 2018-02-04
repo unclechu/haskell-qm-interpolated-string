@@ -249,12 +249,10 @@ spec = do
     it "Interpolation" $ [qmb| foo {1+2} |] `shouldBe` "foo 3"
 
   it "Haddock example" $ do
+    [qmb| foo {'b':'a':'r':""}
+          baz |] `shouldBe` "foo bar\nbaz"
     [qmb| foo
           {'b':'a':'r':""}
           baz |] `shouldBe` "foo\nbar\nbaz"
-    [qmb| foo
-          {'b':'a':'r':""}
-          baz |] `shouldBe` "foo\nbar\nbaz"
-    -- Double-space with escaping
     [qmb| foo {'b':'a':'r':""}
         \ baz |] `shouldBe` "foo bar\n baz"

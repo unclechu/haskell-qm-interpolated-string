@@ -222,3 +222,5 @@ spec = do
     [qn| foo
        \ {'b':'a':'r':""}
        \ baz |] `shouldBe` "foo {'b':'a':'r':\"\"} baz"
+    [qn| foo {'b':'a':'r':""}
+         baz |] `shouldBe` "foo {'b':'a':'r':\"\"}baz"
