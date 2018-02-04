@@ -257,6 +257,11 @@ main = let foo = Foo 10 20 in putStrLn [qm| Foo is: {foo {baz = 30\}} |]
 -- Foo is: Foo {bar = 10, baz = 30}
 ```
 
+## Wanna make a contribution or maintain your own fork?
+
+You can find some info for developers on
+[wiki pages](https://github.com/unclechu/haskell-qm-interpolated-string/wiki).
+
 ## Author
 
 [Viacheslav Lotsmanov](https://github.com/unclechu)
