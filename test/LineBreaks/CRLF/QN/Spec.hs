@@ -173,6 +173,12 @@ spec = do
 
   describe "New README examples" $ do
 
+    it "First example" $
+      [qn| Hello,
+           world!
+           Pi is {floor pi}.{floor $ (pi - 3) * 100}… |]
+        `shouldBe` "Hello,world!Pi is {floor pi}.{floor $ (pi - 3) * 100}…"
+
     it "Simple usage example" $
       [qn|
         <article>

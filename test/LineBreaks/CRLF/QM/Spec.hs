@@ -176,6 +176,12 @@ spec = do
 
   describe "New README examples" $ do
 
+    it "First example" $
+      [qm| Hello,
+           world!
+           Pi is {floor pi}.{floor $ (pi - 3) * 100}… |]
+        `shouldBe` "Hello,world!Pi is 3.14…"
+
     it "Simple usage example" $ do
       let title = "Testing"
           text = "Some testing text"
