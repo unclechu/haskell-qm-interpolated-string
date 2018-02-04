@@ -98,9 +98,12 @@ spec = do
       [qns| foo\\
             bar  |] `shouldBe` "foo\\ bar"
 
-    describe "Escaping inside interpolation blocks" $ do
+    -- By 'not really' it means we just shows here what happens with examples
+    -- for QMS when we use them with QNS quoter.
+    describe "Escaping inside interpolation blocks (not really!)" $ do
 
-      it "Line-breaks must be interpreted as just haskell code" $ do
+      it "Line-breaks must be interpreted as just haskell code\
+         \ (not really!)" $ do
         [qns| {'\n'}          |] `shouldBe` "{'\n'}"
         [qns| {"foo\nbar"}    |] `shouldBe` "{\"foo\nbar\"}"
         [qns| {"foo\\nbar"}   |] `shouldBe` "{\"foo\\nbar\"}"
@@ -140,12 +143,13 @@ spec = do
         [qns| {123}}   |] `shouldBe` "{123}}"
 
       it "When interpolation block is escaped\
-         \ everything must be interpreted as usual" $ do
+         \ everything must be interpreted as usual (not really)" $ do
         [qns| \{ foo\nbar\\baz\} } |] `shouldBe` "\\{ foo\nbar\\baz\\} }"
         [qns| \{ foo\
                  bar } |] `shouldBe` "\\{ foobar }"
 
-      it "Tabs characters in string inside interpolation block" $ do
+      it "Tabs characters in string inside interpolation block\
+         \ (not really)" $ do
         [qns| {"foo\t\tbar" } |] `shouldBe` "{\"foo\t\tbar\" }"
         [qns| {"foo		bar"  } |] `shouldBe` "{\"foo\t\tbar\"  }"
         [qns| {"foo\\t\tbar"} |] `shouldBe` "{\"foo\\t\tbar\"}"
