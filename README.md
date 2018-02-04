@@ -227,4 +227,4 @@ If you don't need interpolation - just replace `m` to `n` in quasi-quoter name:
 
 ## License
 
-[The Unlicense](./LICENSE)
+[The Unlicense](LICENSE)
