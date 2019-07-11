@@ -257,6 +257,33 @@ main = let foo = Foo 10 20 in putStrLn [qm| Foo is: {foo {baz = 30\}} |]
 -- Foo is: Foo {bar = 10, baz = 30}
 ```
 
+## Syntax highlighting
+
+### Vim or Neovim
+
+#### "haskell-vim" plugin
+
+If you use [haskell-vim][haskell-vim] plugin (I personally use
+[my own fork][my-haskell-vim-fork] which supports `UnicodeSyntax`) just add to
+your `.vimrc` or `init.vim` this:
+
+```vim
+fu! s:highlight_haskell_qm_interpolation_blocks()
+  sy match haskellQMStr "." containedin=haskellQM contained
+
+  sy region haskellQMBlock matchgroup=haskellDelimiter
+    \ start="\(^\|\(^\|[^\\]\)\(\\\\\)*\)\@<={" end="}"
+    \ contains=TOP,@Spell containedin=haskellQM contained
+
+  sy region haskellQM matchgroup=haskellTH
+    \ start="\[qm\(b\|s\)\?|" end="|\]"
+
+  hi def link haskellQMStr String
+endf
+
+au FileType haskell cal s:highlight_haskell_qm_interpolation_blocks()
+```
+
 ## Wanna make a contribution or maintain your own fork?
 
 You can find some info for developers on
@@ -269,3 +296,6 @@ You can find some info for developers on
 ## License
 
 [The Unlicense](LICENSE)
+
+[haskell-vim]: https://github.com/neovimhaskell/haskell-vim
+[my-haskell-vim-fork]: https://github.com/unclechu/haskell-vim
