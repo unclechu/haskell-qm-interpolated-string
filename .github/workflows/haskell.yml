@@ -48,5 +48,40 @@ jobs:
     - name: Build
       run: cabal build --enable-tests --enable-benchmarks all
 
+    - name: Test Haddock generation
+      run: cabal haddock
+
     - name: Run tests
       run: cabal test all
+
+  stack-build-and-test:
+    strategy:
+      matrix:
+        ghc: ['9.0.2', 'latest']
+        stack: ['2.3.1', 'latest']
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup GHC ${{ matrix.ghc }} and Stack ${{ matrix.stack }} on ${{ matrix.os }}
+      uses: actions/setup-haskell@v1
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        stack-version: ${{ matrix.stack }}
+        enable-stack: true
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+        key: ${{ matrix.os }}-stack-${{ hashFiles('stack.yaml.lock', 'qm-interpolated-string.cabal') }}
+        restore-keys: |
+          ${{ matrix.os }}-stack
+
+    - name: Build and test
+      run: stack build --haddock --test --bench
