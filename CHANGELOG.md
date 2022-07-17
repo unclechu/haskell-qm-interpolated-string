@@ -13,6 +13,14 @@
 * Drop GHC 7.x support because I have no options on CI to test it. It doesn’t
   mean it will no longer work with 7.x for sure but it’s not tested anymore.
 
+* Increase minimal Cabal version requirement from `1.8` to `1.10` because
+  Hackage requires at least `1.10` now. Also add `default-language` to every
+  component because Hackage reports this error:
+
+  > Packages using 'cabal-version: >= 1.10' and before 'cabal-version: 3.4' must
+  > specify the 'default-language' field for each component (e.g. Haskell98 or
+  > Haskell2010).
+
 ## <a name="v0.3.0.0"></a>0.3.0.0
 
 * Testing on GHC 8.2.2

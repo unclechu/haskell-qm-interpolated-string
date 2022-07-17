@@ -13,7 +13,7 @@ category:           Data
 build-type:         Simple
 extra-source-files: README.md CHANGELOG.md
 
-cabal-version:      >=1.8
+cabal-version:      >=1.10
 
 tested-with:        GHC == 8.0.2
                   , GHC == 8.2.2
@@ -41,6 +41,7 @@ library
                  , haskell-src-meta >=0.3 && <0.9
                  , bytestring >=0.10 && <0.12
                  , text >=1.0 && <3
+  default-language: Haskell2010
 
 test-suite tests
   type:           exitcode-stdio-1.0
@@ -67,3 +68,4 @@ test-suite tests
   build-depends:  base ==4.*
                 , hspec ==2.*
                 , qm-interpolated-string
+  default-language: Haskell2010
