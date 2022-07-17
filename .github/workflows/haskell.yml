@@ -16,11 +16,16 @@ jobs:
 
     strategy:
       matrix:
-        ghc: ['8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3']
+        ghc: ['7.10.3', '8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3', '9.0.2']
         cabal: ['1.8', '2.4', '3.2']
         os: [ubuntu-latest, macOS-latest, windows-latest]
         exclude:
           # GHC 8.8+ doesn’t support Cabal below v3
+
+          - ghc: 7.10.3
+            cabal: 1.8
+          - ghc: 7.10.3
+            cabal: 2.4
 
           - ghc: 8.0.2
             cabal: 1.8
