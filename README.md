@@ -287,7 +287,7 @@ au FileType haskell cal s:highlight_haskell_qm_interpolation_blocks()
 
 ## Wanna make a contribution or maintain your own fork?
 
-See [CONTRIBUTING.md](CONTRIBUTING.md).
+See [CONTRIBUTING.md][CONTRIBUTING.md].
 
 ## Author
 
@@ -299,8 +299,11 @@ which was originally created by Audrey Tang.
 
 ## License
 
-[The Unlicense](LICENSE)
+[The Unlicense][LICENSE]
 
 [haskell-vim]: https://github.com/neovimhaskell/haskell-vim
 [my-haskell-vim-fork]: https://github.com/unclechu/haskell-vim
 [fork-origin]: https://github.com/audreyt/interpolatedstring-perl6/blob/63d91a83eb5e48740c87570a8c7fd4668afe6832/src/Text/InterpolatedString/Perl6.hs
+
+[CONTRIBUTING.md]: https://github.com/unclechu/haskell-qm-interpolated-string/blob/master/CONTRIBUTING.md
+[LICENSE]: https://github.com/unclechu/haskell-qm-interpolated-string/blob/master/LICENSE
