@@ -2,6 +2,9 @@
 
 [![Hackage](https://img.shields.io/hackage/v/qm-interpolated-string.svg)](https://hackage.haskell.org/package/qm-interpolated-string)
 
+- ![Haskell Cabal & Stack CI](https://github.com/unclechu/haskell-qm-interpolated-string/actions/workflows/haskell.yml/badge.svg)
+- ![Nix CI](https://github.com/unclechu/haskell-qm-interpolated-string/actions/workflows/nix.yml/badge.svg)
+
 Implementation of interpolated multiline string
 [QuasiQuoter](https://wiki.haskell.org/Quasiquotation)
 that ignores indentation and trailing whitespaces.
