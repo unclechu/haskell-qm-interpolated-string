@@ -2,9 +2,10 @@
 .cabal-sandbox
 cabal.sandbox.config
 dist
+dist-newstyle
 
 # ctags
 tags
 
-# local vim configs
-.lvimrc
+# Nix build artifacts
+result*
