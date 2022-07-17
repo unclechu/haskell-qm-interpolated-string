@@ -285,12 +285,11 @@ au FileType haskell cal s:highlight_haskell_qm_interpolation_blocks()
 
 ## Wanna make a contribution or maintain your own fork?
 
-You can find some info for developers on
-[wiki pages](https://github.com/unclechu/haskell-qm-interpolated-string/wiki).
+See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 ## Author
 
-[Viacheslav Lotsmanov](https://github.com/unclechu)
+Viacheslav Lotsmanov
 
 ## License
 
