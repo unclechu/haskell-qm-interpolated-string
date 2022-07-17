@@ -293,9 +293,14 @@ See [CONTRIBUTING.md](CONTRIBUTING.md).
 
 Viacheslav Lotsmanov
 
+This library is a heavily rewritten and extended fork of
+[interpolatedstring-perl6][fork-origin]
+which was originally created by Audrey Tang.
+
 ## License
 
 [The Unlicense](LICENSE)
 
 [haskell-vim]: https://github.com/neovimhaskell/haskell-vim
 [my-haskell-vim-fork]: https://github.com/unclechu/haskell-vim
+[fork-origin]: https://github.com/audreyt/interpolatedstring-perl6/blob/63d91a83eb5e48740c87570a8c7fd4668afe6832/src/Text/InterpolatedString/Perl6.hs
