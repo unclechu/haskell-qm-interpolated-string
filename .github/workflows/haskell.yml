@@ -15,7 +15,7 @@ jobs:
   cabal-build-and-test:
     strategy:
       matrix:
-        ghc: ['8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3', '9.0.2', 'latest']
+        ghc: ['8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3', '9.0.2', '9.2.3', 'latest']
         cabal: ['1.8', '2.4', '3.2', 'latest']
         os: [ubuntu-latest]
         exclude:
@@ -31,6 +31,10 @@ jobs:
           - ghc: 9.0.2
             cabal: 1.8
           - ghc: 9.0.2
+            cabal: 2.4
+          - ghc: 9.2.3
+            cabal: 1.8
+          - ghc: 9.2.3
             cabal: 2.4
           - ghc: latest
             cabal: 1.8
@@ -77,7 +81,7 @@ jobs:
   stack-build-and-test:
     strategy:
       matrix:
-        ghc: ['9.0.2', 'latest']
+        ghc: ['9.0.2', '9.2.3', 'latest']
         stack: ['2.3.1', 'latest']
         os: [ubuntu-latest]
 
@@ -99,9 +103,41 @@ jobs:
         path: |
           ~/.stack
           .stack-work
-        key: ${{ matrix.os }}-stack-${{ hashFiles('stack.yaml.lock', 'qm-interpolated-string.cabal') }}
+        key: ${{ matrix.os }}-stack-${{ hashFiles('stack.yaml', 'stack.yaml.lock', 'qm-interpolated-string.cabal') }}
         restore-keys: |
           ${{ matrix.os }}-stack
 
     - name: Build and test
       run: stack build --haddock --test --bench
+
+  stack-build-and-test-ghc-9_2_3:
+    strategy:
+      matrix:
+        ghc: ['9.2.3']
+        stack: ['2.3.1']
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup GHC ${{ matrix.ghc }} and Stack ${{ matrix.stack }} on ${{ matrix.os }}
+      uses: actions/setup-haskell@v1
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        stack-version: ${{ matrix.stack }}
+        enable-stack: true
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+        key: ${{ matrix.os }}-stack-${{ hashFiles('stack-ghc-9.2.3.yaml', 'stack-ghc-9.2.3.yaml.lock', 'qm-interpolated-string.cabal') }}
+        restore-keys: |
+          ${{ matrix.os }}-stack
+
+    - name: Build and test
+      run: stack build --stack-yaml stack-ghc-9.2.3.yaml --haddock --test --bench

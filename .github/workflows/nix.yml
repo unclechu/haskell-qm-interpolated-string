@@ -26,3 +26,25 @@ jobs:
 
       # nix-build includes running tests for the Haskell library too
       - run: nix-build
+
+  nix-build-and-test-ghc-9_2_3:
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+      - uses: actions/checkout@v2.4.0
+
+      - name: Install Nix
+        uses: cachix/install-nix-action@v15
+        with:
+          extra_nix_config: |
+            access-tokens = github.com=${{ secrets.GITHUB_TOKEN }}
+            system-features = nixos-test benchmark big-parallel kvm
+
+      # nix-build includes running tests for the Haskell library too
+      - run: |
+          # HLS fails to build against GHC 9.2.3 at the moment
+          nix-build --argstr ghcVersion ghc923 --arg withHLS false -o result-ghc-9.2.3

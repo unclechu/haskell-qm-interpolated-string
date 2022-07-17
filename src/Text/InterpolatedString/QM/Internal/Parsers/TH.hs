@@ -1,3 +1,4 @@
+{-# LANGUAGE CPP #-}
 {-# LANGUAGE PackageImports #-}
 {-# LANGUAGE ViewPatterns #-}
 
@@ -204,7 +205,12 @@ parserTpl (TH.mkName &&& varE -> (n, fE)) withInterpolation lineBreaks = return
 
 varP :: String ->             TH.Pat ; varP = TH.VarP . TH.mkName
 varE :: String ->             TH.Exp ; varE = TH.VarE . TH.mkName
+#if MIN_VERSION_template_haskell(2,18,0)
+conP :: String -> [TH.Pat] -> TH.Pat ; conP = flip TH.ConP mempty . TH.mkName
+#else
 conP :: String -> [TH.Pat] -> TH.Pat ; conP = TH.ConP . TH.mkName
+#endif
+
 conE :: String ->             TH.Exp ; conE = TH.ConE . TH.mkName
 
 chrP :: Char   -> TH.Pat ; chrP = TH.LitP . TH.CharL

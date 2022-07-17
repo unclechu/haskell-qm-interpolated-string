@@ -1,3 +1,18 @@
+## <a name="v0.3.1.0"></a>0.3.1.0
+
+* Support GHC 9.2.3
+* Drop Travis CI (no longer available for free for open source projects)
+
+* Add GitHub Actions CI configuration
+  * Nix-based
+  * Plain Cabal & Stack setups with multiple GHC versions
+
+* Add Nix configuration (only affects development)
+* Add [Stack](https://haskellstack.org) support
+
+* Drop GHC 7.x support because I have no options on CI to test it. It doesn’t
+  mean it will no longer work with 7.x for sure but it’s not tested anymore.
+
 ## <a name="v0.3.0.0"></a>0.3.0.0
 
 * Testing on GHC 8.2.2
