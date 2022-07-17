@@ -1,3 +1,5 @@
+# See also https://github.com/actions/setup-haskell
+
 name: Haskell CI
 
 on:
