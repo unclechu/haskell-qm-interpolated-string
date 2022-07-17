@@ -8,7 +8,7 @@ that ignores indentation and trailing whitespaces.
 
 Actually it's modification of
 [interpolatedstring-perl6](https://github.com/audreyt/interpolatedstring-perl6)
-package. I've forked it to implemenent my own strings I really like.
+package. I've forked it to implement my own strings I really like.
 
 This implementation based on `qc` from **interpolatedstring-perl6** package
 but ignores any indentation, line breaks
@@ -132,7 +132,7 @@ blocks, which has `m` in their names) interpolation blocks work different. When
 curly bracket (`{`) opens everything inside until it closes (by `}`) is parsed
 as bare as possible to be given to
 [haskell-src-meta](http://hackage.haskell.org/package/haskell-src-meta)
-without any modifications, to be parsed as bare haskell code.
+without any modifications, to be parsed as bare Haskell code.
 
 But you might need use curly brackets inside an interpolation block. I don't
 think it would be a good idea, because complicated logic there may cause code

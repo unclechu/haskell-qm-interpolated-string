@@ -21,8 +21,8 @@
 
   Once I noticed that `[qm|{"\n"}|]` compiles to `"n"`, I considered this as a
   bug, I also realized that interpolation blocks aren't interpreted as a bare
-  haskell code as I was expecting. My bad, I've missed that, haven't written
-  enought tests to cover such scenarios, it migrated from original
+  Haskell code as I was expecting. My bad, I've missed that, haven't written
+  enough tests to cover such scenarios, it migrated from original
   *interpolatedstring-perl6* package. So I had to fix this mistake,
   notwithstanding it can break your code when you update the library. Now
   everything inside interpolation blocks is taken as bare haskell code as
