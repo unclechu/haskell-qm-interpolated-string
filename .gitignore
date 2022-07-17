@@ -9,3 +9,6 @@ tags
 
 # Nix build artifacts
 result*
+
+# direnv configuration file
+.envrc

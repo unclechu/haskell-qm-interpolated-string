@@ -1,0 +1,3 @@
+# direnv configuration example
+watch_file qm-interpolated-string.cabal
+use nix
