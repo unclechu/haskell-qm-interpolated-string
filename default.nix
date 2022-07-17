@@ -24,13 +24,24 @@ let
       self.callCabal2nix "qm-interpolated-string" (cleanSource ./.) {};
   });
 
+  generate-cr-and-crlf-tests = pkgs.writeShellApplication {
+    name = "generate-cr-and-crlf-tests.sh";
+    text = builtins.readFile ./generate-cr-and-crlf-tests.sh;
+
+    runtimeInputs = [
+      pkgs.coreutils
+      pkgs.gnused
+    ];
+  };
+
   shell = hsPkgs.shellFor {
     name = "qm-interpolated-string-shell";
     packages = p: [ p.qm-interpolated-string ];
     inherit withHoogle;
 
-    buildInputs =
-      lib.optional (builtins.elem "cabal" buildTools) hsPkgs.cabal-install
+    buildInputs = [
+      generate-cr-and-crlf-tests
+    ] ++ lib.optional (builtins.elem "cabal" buildTools) hsPkgs.cabal-install
       ++ lib.optional (builtins.elem "stack" buildTools) hsPkgs.stack
       ++ lib.optional withHLS hsPkgs.haskell-language-server;
   };

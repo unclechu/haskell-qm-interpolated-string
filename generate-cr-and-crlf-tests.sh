@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
-set -e
+
+set -o errexit || exit
+set -o nounset
+set -o pipefail
+
 exec 0<&-
 APP_NAME=$(basename -- "$0")
 DEST_DIR='test/LineBreaks'
@@ -8,6 +12,10 @@ mkdir -p -- "$DEST_DIR"/CRLF/Q{M,N}{,B,S}/
 # mkdir -p -- "$DEST_DIR"/{CR,CRLF}/Q{M,N}{,B,S}/
 
 handle-break() {
+	set -o errexit || exit
+	set -o nounset
+	set -o pipefail
+
 	local dir="$DEST_DIR/$2/$3"
 	local file="$dir/${1##*/}"
 	local eof=; if [[ $2 == "CR" ]]; then eof='\r'; else eof='\r\n'; fi

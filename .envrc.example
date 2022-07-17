@@ -1,3 +1,4 @@
 # direnv configuration example
 watch_file qm-interpolated-string.cabal
+watch_file generate-cr-and-crlf-tests.sh
 use nix
