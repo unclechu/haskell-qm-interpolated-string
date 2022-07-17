@@ -1,0 +1,107 @@
+# See also https://github.com/actions/setup-haskell
+
+name: Haskell CI
+
+on:
+  push:
+    branches: [ "master" ]
+  pull_request:
+    branches: [ "master" ]
+
+permissions:
+  contents: read
+
+jobs:
+  cabal-build-and-test:
+    strategy:
+      matrix:
+        ghc: ['8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3', '9.0.2', 'latest']
+        cabal: ['1.8', '2.4', '3.2', 'latest']
+        os: [ubuntu-latest]
+        exclude:
+          # GHC 8.8+ only works with cabal v3+
+          - ghc: 8.8.3
+            cabal: 1.8
+          - ghc: 8.8.3
+            cabal: 2.4
+          - ghc: 8.10.3
+            cabal: 1.8
+          - ghc: 8.10.3
+            cabal: 2.4
+          - ghc: 9.0.2
+            cabal: 1.8
+          - ghc: 9.0.2
+            cabal: 2.4
+          - ghc: latest
+            cabal: 1.8
+          - ghc: latest
+            cabal: 2.4
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup GHC ${{ matrix.ghc }} and Cabal ${{ matrix.cabal }} on ${{ matrix.os }}
+      uses: actions/setup-haskell@v1
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        cabal-version: ${{ matrix.cabal }}
+
+    - name: Cache
+      uses: actions/cache@v3
+      env:
+        cache-name: cache-cabal
+      with:
+        path: ~/.cabal
+        key: ${{ matrix.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/*.cabal') }}-${{ hashFiles('**/cabal.project') }}
+        restore-keys: |
+          ${{ matrix.os }}-build-${{ env.cache-name }}-
+          ${{ matrix.os }}-build-
+          ${{ matrix.os }}-
+
+    - name: Install dependencies
+      run: |
+        cabal update
+        cabal build --only-dependencies --enable-tests --enable-benchmarks
+
+    - name: Build
+      run: cabal build --enable-tests --enable-benchmarks all
+
+    - name: Test Haddock generation
+      run: cabal haddock
+
+    - name: Run tests
+      run: cabal test all
+
+  stack-build-and-test:
+    strategy:
+      matrix:
+        ghc: ['9.0.2', 'latest']
+        stack: ['2.3.1', 'latest']
+        os: [ubuntu-latest]
+
+    runs-on: ${{ matrix.os }}
+
+    steps:
+    - uses: actions/checkout@v3
+
+    - name: Setup GHC ${{ matrix.ghc }} and Stack ${{ matrix.stack }} on ${{ matrix.os }}
+      uses: actions/setup-haskell@v1
+      with:
+        ghc-version: ${{ matrix.ghc }}
+        stack-version: ${{ matrix.stack }}
+        enable-stack: true
+
+    - name: Cache
+      uses: actions/cache@v2
+      with:
+        path: |
+          ~/.stack
+          .stack-work
+        key: ${{ matrix.os }}-stack-${{ hashFiles('stack.yaml.lock', 'qm-interpolated-string.cabal') }}
+        restore-keys: |
+          ${{ matrix.os }}-stack
+
+    - name: Build and test
+      run: stack build --haddock --test --bench
