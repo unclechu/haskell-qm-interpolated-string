@@ -1,8 +1,11 @@
-# cabal stuff
+# cabal build artifacts
 .cabal-sandbox
 cabal.sandbox.config
 dist
 dist-newstyle
+
+# stack build artifacts
+.stack-work
 
 # ctags
 tags
