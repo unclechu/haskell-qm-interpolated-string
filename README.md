@@ -1,7 +1,6 @@
 # [qm|interpolated-string|]
 
 [![Hackage](https://img.shields.io/hackage/v/qm-interpolated-string.svg)](https://hackage.haskell.org/package/qm-interpolated-string)
-[![Build Status](https://travis-ci.org/unclechu/haskell-qm-interpolated-string.svg?branch=master)](https://travis-ci.org/unclechu/haskell-qm-interpolated-string)
 
 Implementation of interpolated multiline string
 [QuasiQuoter](https://wiki.haskell.org/Quasiquotation)
