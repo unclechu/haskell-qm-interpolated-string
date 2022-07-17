@@ -4,7 +4,15 @@ let
 in
 
 { pkgs ? import sources.nixpkgs {}
-, haskellPackages ? pkgs.haskellPackages
+
+, ghcVersion ? null # e.g. “--argstr ghcVersion ghc923”
+
+, haskellPackages ?
+    if isNull ghcVersion
+    then pkgs.haskellPackages # The default one from the nixpkgs pin
+    else
+      assert builtins.isString ghcVersion;
+      pkgs.haskell.packages.${ghcVersion}
 
 # nix-shell options
 , inNixShell ? false # Automatically set to `true` when used by nix-shell
