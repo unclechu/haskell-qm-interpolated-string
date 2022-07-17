@@ -18,25 +18,24 @@ jobs:
         ghc: ['8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3', '9.0.2', 'latest']
         cabal: ['1.8', '2.4', '3.2', 'latest']
         os: [ubuntu-latest]
-
-    exclude:
-      # GHC 8.8+ only works with cabal v3+
-      - ghc: 8.8.3
-        cabal: 1.8
-      - ghc: 8.8.3
-        cabal: 2.4
-      - ghc: 8.10.3
-        cabal: 1.8
-      - ghc: 8.10.3
-        cabal: 2.4
-      - ghc: 9.0.2
-        cabal: 1.8
-      - ghc: 9.0.2
-        cabal: 2.4
-      - ghc: latest
-        cabal: 1.8
-      - ghc: latest
-        cabal: 2.4
+        exclude:
+          # GHC 8.8+ only works with cabal v3+
+          - ghc: 8.8.3
+            cabal: 1.8
+          - ghc: 8.8.3
+            cabal: 2.4
+          - ghc: 8.10.3
+            cabal: 1.8
+          - ghc: 8.10.3
+            cabal: 2.4
+          - ghc: 9.0.2
+            cabal: 1.8
+          - ghc: 9.0.2
+            cabal: 2.4
+          - ghc: latest
+            cabal: 1.8
+          - ghc: latest
+            cabal: 2.4
 
     runs-on: ${{ matrix.os }}
 
