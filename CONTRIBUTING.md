@@ -3,6 +3,92 @@
 This document has some notes, instructions, and recommendations for making a
 contribution to the project.
 
+
+## Development environment
+
+This project supports 3 build tools:
+
+1. [Cabal](https://www.haskell.org/cabal/)
+2. [Stack](https://haskellstack.org)
+3. [Nix (package manager)](https://github.com/NixOS/nix)
+   (also Cabal and Stack are available in the nix-shell configuration)
+
+
+### Cabal
+
+``` sh
+cabal build
+```
+
+
+### Stack
+
+``` sh
+stack build
+```
+
+
+### Nix
+
+#### Build
+
+``` sh
+nix-build
+```
+
+See for `result*` files.
+
+#### Enter development nix-shell
+
+``` sh
+nix-shell
+```
+
+You can also use [direnv](https://direnv.net/).
+See [.envrc example file](.envrc.example).
+
+##### Using Cabal and Stack inside nix-shell
+
+Cabal is turned on by default. You can change what tools are available by
+providing `buildTools` argument:
+
+``` sh
+nix-shell --arg buildTools '[ "cabal" "stack" ]'
+```
+
+##### Haskell Language Server
+
+[HLS](https://github.com/haskell/haskell-language-server) is turned on by
+default (see `withHLS` argument).
+
+###### Vim
+
+If you are using (Neo)Vim you can use
+[vim-lsp](https://github.com/prabirshrestha/vim-lsp) plugin.
+Here is a configuration example:
+
+``` viml
+if executable('haskell-language-server-wrapper')
+  aug HaskellLsp
+  au! User lsp_setup cal lsp#register_server({
+    \ 'name': 'hls',
+    \ 'cmd': {server_info->['haskell-language-server-wrapper', '--lsp']},
+    \ 'allowlist': ['haskell'],
+    \ })
+  aug END
+en
+```
+
+##### Using different GHC versions
+
+See `nixpkgs.haskell.packages.*` for available GHC versions.
+Example (HLS was failing to build with GHC 9.2.3 at the moment, turned it off):
+
+``` sh
+nix-shell --argstr ghcVersion ghc923 --arg withHLS false
+```
+
+
 ## How to upload new version to Hackage
 
 **WARNING!** Disclaimer: This instruction was written in 2018. Some parts are
