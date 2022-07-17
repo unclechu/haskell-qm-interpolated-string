@@ -10,7 +10,7 @@ permissions:
   contents: read
 
 jobs:
-  Cabal build and test:
+  cabal-build-and-test:
     strategy:
       matrix:
         ghc: ['8.0.2', '8.2.2', '8.6.5', '8.8.3', '8.10.3', '9.0.2']
